@@ -3,7 +3,7 @@ from django.db import models
 
 class BranchModel(models.Model):
     name = models.TextField()
-    url = models.TextField()
+    url = models.URLField(default=None)
     explanation = models.TextField(null=True)
     metric = models.ManyToManyField('BranchMetric', blank=True)
 

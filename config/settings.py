@@ -40,6 +40,8 @@ INSTALLED_APPS = [
 ]+[
     'branch',
     'comment',
+]+[
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
