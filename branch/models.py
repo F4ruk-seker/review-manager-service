@@ -18,7 +18,7 @@ class BranchMetric(models.Model):
     calculation_time = models.DateField(auto_created=True)
 
     def get_total_metric(self):
-        return self.excitement_count + self.competence_count + self.powerful_count + self.sincere_count + self.reputable_count
+        return sum((self.excitement_count, self.competence_count, self.powerful_count, self.sincere_count, self.reputable_count))
 
     def get_metric_as_percentile_ord_isgyh(self):
         total = self.get_total_metric()
@@ -39,3 +39,5 @@ class BranchMetric(models.Model):
             {"name": "competence", "result": round((self.competence_count / total) * 100, 2)},  # yetkinlik
             {"name": "excitement", "result": round((self.excitement_count / total) * 100, 2)},  # heyecan
         ]
+
+
