@@ -9,3 +9,5 @@ from branch.api.serializers import BranchMetricSerializer
 class BranchMetricCreateView(CreateAPIView):
     queryset = BranchMetric.objects.all()
     serializer_class = BranchMetricSerializer
+
+

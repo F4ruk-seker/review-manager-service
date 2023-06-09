@@ -1,9 +1,14 @@
 from django.db import models
+import uuid
 
 
 class BranchModel(models.Model):
-    name = models.TextField()
-    url = models.URLField(default=None)
+    id = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False)
+    name = models.TextField(null=False)
+    url = models.URLField(default=None, null=False)
     explanation = models.TextField(null=True)
     metric = models.ManyToManyField('BranchMetric', blank=True)
 

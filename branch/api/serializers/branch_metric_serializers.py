@@ -7,3 +7,4 @@ class BranchMetricSerializer(serializers.ModelSerializer):
         model = BranchMetric
         # fields = '__all__'
         exclude = ('calculation_time', )
+
