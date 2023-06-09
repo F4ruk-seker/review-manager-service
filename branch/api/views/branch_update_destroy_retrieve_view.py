@@ -6,7 +6,7 @@ from branch.models import BranchModel
 from branch.api.serializers import BranchSerializer
 
 
-class BranchCreateUpdateDestroyRetrieveView(CreateModelMixin, DestroyModelMixin, RetrieveModelMixin, UpdateModelMixin, GenericAPIView):
+class BranchUpdateDestroyRetrieveView(DestroyModelMixin, RetrieveModelMixin, UpdateModelMixin, GenericAPIView):
     queryset = BranchModel.objects.all()
     serializer_class = BranchSerializer
     lookup_field = 'id'
@@ -16,9 +16,6 @@ class BranchCreateUpdateDestroyRetrieveView(CreateModelMixin, DestroyModelMixin,
 
     def get(self, request, *args, **kwargs):
         return self.retrieve(request, *args, **kwargs)
-
-    def post(self, request, *args, **kwargs):
-        return self.create(request, *args, **kwargs)
 
     def put(self, request, *args, **kwargs):
         return self.update(request, *args, **kwargs)
