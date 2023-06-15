@@ -8,9 +8,15 @@ class BranchModel(models.Model):
         default=uuid.uuid4,
         editable=False)
     name = models.TextField(null=False)
-    url = models.URLField(default=None, null=False)
+    url = models.TextField(default=None, null=False)
     explanation = models.TextField(null=True)
     metric = models.ManyToManyField('BranchMetric', blank=True)
+
+    def get_metrics(self):
+        return self.metric.all().order_by("calculation_time")
+
+    def get_last_metric(self):
+        return self.get_metrics().first()
 
 
 class BranchMetric(models.Model):
@@ -23,10 +29,19 @@ class BranchMetric(models.Model):
     calculation_time = models.DateField(auto_created=True)
 
     def get_total_metric(self):
-        return sum((self.excitement_count, self.competence_count, self.powerful_count, self.sincere_count, self.reputable_count))
+        return sum(self.get_counter_counts().values())
 
     def get_metric_as_percentile_ord_isgyh(self):
         total = self.get_total_metric()
+        result: list = []
+        for count in self.get_counter_counts():
+            count: dict = count
+            k, v = count.items()
+            result.append(
+                int(round((v / total) * 100, 2)),
+            )
+        return result
+    '''
         return [
             int(round((self.sincere_count / total) * 100, 2)),  # içten
             int(round((self.reputable_count / total) * 100, 2)),  # saygınlık
@@ -34,6 +49,7 @@ class BranchMetric(models.Model):
             int(round((self.competence_count / total) * 100, 2)),  # yetkinlik
             int(round((self.excitement_count / total) * 100, 2)),  # heyecan
         ]
+    '''
 
     def get_metric(self):
         total = self.get_total_metric()
@@ -44,5 +60,12 @@ class BranchMetric(models.Model):
             {"name": "competence", "result": round((self.competence_count / total) * 100, 2)},  # yetkinlik
             {"name": "excitement", "result": round((self.excitement_count / total) * 100, 2)},  # heyecan
         ]
+
+    def get_counter_counts(self) -> dict:
+        counter_counts: dict = {}
+        for k, v in self.__dict__.items():
+            if k.endswith("count"):
+                counter_counts[k] = v
+        return counter_counts
 
 

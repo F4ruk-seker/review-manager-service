@@ -24,7 +24,10 @@
     <option name="TEMPLATE_CONFIGURATION" value="Django" />
     <option name="TEMPLATE_FOLDERS">
       <list>
-        <option value="$MODULE_DIR$/../MapperManager\templates" />
+        <option value="$MODULE_DIR$/templates" />
+        <option value="$MODULE_DIR$/branch/templates" />
+        <option value="$MODULE_DIR$/static" />
+        <option value="$MODULE_DIR$/static/jquery" />
       </list>
     </option>
   </component>
