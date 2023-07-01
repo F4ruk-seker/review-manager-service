@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% block title %}TEST{% endblock %}
+
+
+{% block content %}
+    <div class="card bg-dark">
+        <h1 class="display-6 text-light">{{ pool.name }}</h1>
+        <hr class="text-light">
+
+        <div class="d-flex">
+
+            <button type="button" onclick="view_selected_tag('')" class="btn btn-outline-info me-1">Tümü <span style="color:red">({{ pool.comments.count }})</span></button>
+            <div class="btn btn-outline-success me-1">
+                {% if request.GET.ai == 'true' %}
+                    <input type="checkbox" id="use_ai" checked>
+                {% else %}
+                    <input type="checkbox" id="use_ai">
+                {% endif %}
+                <label for="use_ai">AI tagları dahil et</label>
+            </div>
+            {% for stat in pool.get_colored_stats.items %}
+                <button type="button" onclick="view_selected_tag('{{ stat.0 }}')" class="btn btn-outline-{{ stat.1.color }} me-1">{{ stat.0 }} <span style="color:red">({{ stat.1.count }})</span></button>
+            {% endfor %}
+
+        </div>
+        <hr class="text-light">
+        <table class="table table-dark table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">text</th>
+                    <th scope="col">ai_tag</th>
+                    <th scope="col">tag</th>
+                    <th scope="col">branch</th>
+                </tr>
+            </thead>
+            <tbody style="max-height: 40vh">
+        {% for comment in comments %}
+            <tr>
+                <th scope="row">{{ forloop.counter }}</th>
+                <td>{{ comment.text }}</td>
+                <td>{{ comment.ai_tag }}</td>
+                <td>{{ comment.tag }}</td>
+                <td>{{ comment.branch_from.name }}</td>
+            </tr>
+        {% endfor %}
+            </tbody>
+        </table>
+        </div>
+    
+<script>
+    function view_selected_tag(tag) {
+        console.log('?tag=' + tag + '&?ai=' + document.querySelector("#use_ai").checked)
+        document.location.search = '?tag=' + tag + '&ai=' + document.querySelector("#use_ai").checked
+    }
+</script>
+{% endblock %}

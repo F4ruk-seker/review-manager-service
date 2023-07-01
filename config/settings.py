@@ -40,6 +40,8 @@ INSTALLED_APPS = [
 ]+[
     'branch',
     'comment',
+    'ai',
+
 ]+[
     'rest_framework',
 ]

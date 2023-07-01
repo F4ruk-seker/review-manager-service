@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.exceptions import ValidationError
 
 
 class CommentModel(models.Model):
@@ -14,7 +15,7 @@ class CommentTag(models.Model):
     explanation = models.TextField()
 
     @classmethod
-    def load_built_in_tags(cls):
+    def load_built_in_tags(cls) -> None:
         tags = [
             {"name": "YETKİNLİK", "explanation": "Açıklama yok"},
             {"name": "İÇTEN", "explanation": "Açıklama yok"},
@@ -32,3 +33,18 @@ class CommentTag(models.Model):
     def __str__(self):
         return f"{ self.name } - { self.explanation }"
 
+
+
+
+
+    '''
+    
+    def save(
+        self, *args, **kwargs
+    ):
+        if not self.is_trained:
+            return super().save(self, *args, **kwargs)
+        else:
+            raise ValidationError('you cannot update if your repository is trained')
+            
+    '''

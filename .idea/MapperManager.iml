@@ -28,6 +28,7 @@
         <option value="$MODULE_DIR$/branch/templates" />
         <option value="$MODULE_DIR$/static" />
         <option value="$MODULE_DIR$/static/jquery" />
+        <option value="$MODULE_DIR$/ai/templates" />
       </list>
     </option>
   </component>
