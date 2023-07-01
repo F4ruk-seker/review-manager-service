@@ -35,7 +35,7 @@ class CommentPool(models.Model):
 
     def get_colored_stats(self):
         tags = self.get_stats()
-        colors = ['primary', 'success', 'danger', 'warning', 'info', 'light', 'secondary']
+        colors = ['primary', 'success', 'danger', 'warning', 'info', 'dark', 'secondary', 'light']
         for tag, color in zip(tags, colors):
             tags[tag]['color'] = color
         return tags
