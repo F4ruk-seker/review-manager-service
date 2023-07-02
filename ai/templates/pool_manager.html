@@ -5,7 +5,7 @@
 {% block content %}
     <div class="card py-2 px-3">
         <h4 class="display-6 text-dark">Pool : {{ pool.name }}</h4>
-        <p class="p-6 text-dark">Pool : {{ pool.name }}</p>
+        <p class="p-6 text-danger">id : {{ pool.id }}</p>
         <hr class="text-dark">
 
         <div class="d-flex grid">
@@ -26,28 +26,44 @@
         </div>
         <hr class="text-dark">
         {% if comments %}
-            <table class="table table-sm table-light table-striped border">
-                <thead>
-                    <tr>
-                        <th scope="col">#</th>
-                        <th scope="col">text</th>
-                        <th scope="col">ai_tag</th>
-                        <th scope="col">tag</th>
-                        <th scope="col">branch</th>
-                    </tr>
-                </thead>
-                <tbody style="max-height: 40vh">
-            {% for comment in comments %}
-                <tr>
-                    <th scope="row">{{ forloop.counter }}</th>
-                    <td>{{ comment.text }}</td>
-                    <td>{{ comment.ai_tag }}</td>
-                    <td>{{ comment.tag }}</td>
-                    <td>{{ comment.branch_from.name }}</td>
-                </tr>
-            {% endfor %}
-                </tbody>
-            </table>
+            <div class="mb-2" >
+                <table class="table table-sm table-light table-striped border pb-0 mb-0">
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">text</th>
+                            <th scope="col" style="text-align: center; width: 100px;">ai_tag</th>
+                            <th scope="col" style="text-align: center; width: 100px;">tag</th>
+                            <th scope="col" style="text-align: center; width: 100px;">branch</th>
+                        </tr>
+                    </thead>
+                </table>
+                <div style="overflow-y: auto;max-height: 50vh">
+                    <table class="table table-sm table-light table-striped border">
+                        <tbody>
+                        {% for comment in comments %}
+                            <tr id="comment_temp_{{ comment.id }}" onclick="delete_comment('{{ comment.id }}')">
+                                <th scope="row">{{ forloop.counter }}</th>
+                                <td>{{ comment.text }}</td>
+                                {% if comment.ai_tag %}
+                                    <td>{{ comment.ai_tag.name }}</td>
+                                {% else %}
+                                    <td class="text-secondary">Tanımsız</td>
+                                {% endif %}
+                                {% if comment.tag %}
+                                    <td>{{ comment.tag.name }}</td>
+                                {% else %}
+                                    <td class="text-secondary">Tanımsız</td>
+                                {% endif %}
+                                <td>{{ comment.branch_from.name }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                    <p class="m-0 mt-1"> this table has <span class="text-info fw-semibold"> {{ comments.count }} </span> comment </p>
+
+            </div>
         {% else %}
             <div class="alert alert-info">Here Empty</div>
         {% endif %}
@@ -65,6 +81,24 @@
     function view_selected_tag(tag) {
         console.log('?tag=' + tag + '&?ai=' + document.querySelector("#use_ai").checked)
         document.location.search = '?tag=' + tag + '&ai=' + document.querySelector("#use_ai").checked
+    }
+
+    function delete_comment(id) {
+        var apiUrl = document.location.origin + '/api/comment/' + id
+
+        $.ajax({
+        url: apiUrl,
+        type:"DELETE",
+        dataType: 'json',
+            {#data:{'csrfmiddlewaretoken':'{{ csrf_token }}','comment':id},#}
+        success:function (response) {
+
+            $('#'+'comment_temp_'+id).fadeOut('slow')
+        },
+        error: function(response){
+            console.log(response)
+        }
+        })
     }
 </script>
 {% endblock %}

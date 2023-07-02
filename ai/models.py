@@ -10,10 +10,14 @@ class AIManager(models.Model):
         editable=False)
     name = models.TextField()
     pool = models.ForeignKey('ai.CommentPool', editable=True, on_delete=models.CASCADE, null=True)
-    trained_structure = models.FilePathField(path='/.trained_data', allow_files=['.sav'])
+    # trained_structure = models.FileField(upload_to='D:\.trained_data',  editable=True, default=None, null=True, )
 
 
 class CommentPool(models.Model):
+    id = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False)
     name = models.TextField()
     comments = models.ManyToManyField('comment.CommentModel')
     is_trained = models.BooleanField(default=False)
@@ -25,6 +29,8 @@ class CommentPool(models.Model):
 
         for tag in tag_list:
             tag_list_dict[tag.name] = {'count': 0}
+            tag_list_dict[tag.name]['id'] = tag.id
+            tag_list_dict[tag.name]['name'] = tag.name
 
         for tag in tag_list:
             tag_list_dict[tag.name] = {'count': self.comments.filter(tag=tag).count()}
