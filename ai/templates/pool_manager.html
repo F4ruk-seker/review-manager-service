@@ -84,18 +84,28 @@
     }
 
     function delete_comment(id) {
-        var apiUrl = document.location.origin + '/api/comment/' + id
+        var pool_id = "{{ pool.id }}"
+        var apiUrl = document.location.origin + '/api/ai/tool/pool/'+ pool_id + '/comment/' + id + '/'
+        $('#comment_temp_' + id + ' th').css('color', 'cyan');
+        $('#comment_temp_' + id + ' td').css('color', 'cyan');
 
         $.ajax({
         url: apiUrl,
         type:"DELETE",
         dataType: 'json',
-            {#data:{'csrfmiddlewaretoken':'{{ csrf_token }}','comment':id},#}
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}'
+        },
+
         success:function (response) {
+
 
             $('#'+'comment_temp_'+id).fadeOut('slow')
         },
         error: function(response){
+            $('#comment_temp_' + id + ' th').css('color', 'red');
+            $('#comment_temp_' + id + ' td').css('color', 'red');
+
             console.log(response)
         }
         })
