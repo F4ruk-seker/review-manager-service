@@ -87,7 +87,6 @@
         </div>
     </div>
 <script>
-
     function view_selected_tag(tag) {
         console.log('?tag=' + tag + '&?ai=' + document.querySelector("#use_ai").checked)
         document.location.search = '?tag=' + tag + '&' + 'ai=' + document.querySelector("#use_ai").checked
@@ -104,28 +103,19 @@
     function selected_display() {
 
         var comment_select_display = document.getElementById('comment_selected_message')
-        var comment_area = $('.comment_checkbox')
-        let count = 0
-        for (let i = 0; i < comment_area.length; i++) {
-            if (comment_area[i].checked){
-                count ++
-            }
-        }
-        if (count === 0){
+        var comment_area = $('.comment_checkbox:checked')
+        if (comment_area.length === 0){
             comment_select_display.innerText = 'Tümünü Seç'
         }else {
-            comment_select_display.innerText = 'Tümünü Seç (' + count + ')'
+            comment_select_display.innerText = 'Tümünü Seç (' + comment_area.length + ')'
         }
     }
 
     function many_select_delete() {
         {#var comment_area = document.getElementsByClassName('comment_checkbox')#}
-        var comment_area = $('.comment_checkbox')
-
+        var comment_area = $('.comment_checkbox:checked')
         for (let i = 0; i < comment_area.length; i++) {
-            if (comment_area[i].checked){
-                delete_comment(comment_area[i].parentElement.parentElement.id.replace('comment_temp_', ''))
-            }
+            delete_comment(comment_area[i].parentElement.parentElement.id.replace('comment_temp_', ''))
         }
     }
 
@@ -150,8 +140,10 @@
 
                 success:function (response) {
                    $('#'+'comment_temp_'+id).fadeOut('slow')
-                    document.getElementById('comment_checkbox_' + id).checked = false
-
+                    var comment_bar = document.getElementById('comment_checkbox_' + id)
+                    comment_bar.checked = false
+                    {#comment_bar.parentElement.parentElement.remove()#}
+                    selected_display()
                 },
                 error: function(response){
                     $('#comment_temp_' + id + ' th').css('color', 'red');
@@ -159,7 +151,7 @@
                     console.log(response)
                 }
             })
-        }else {
+        } else {
             console.log('object already removed')
         }
     }
