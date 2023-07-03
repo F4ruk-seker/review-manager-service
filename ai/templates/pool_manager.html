@@ -31,8 +31,8 @@
                     <thead>
                         <tr>
                             <th scope="col">#
-                                <input type="checkbox" onclick="many_select_trigger()" id="many_select_trigger_obj">
-                                <span id="comment_selected_message">Tümünü Seç</span>
+                                <input type="checkbox" onclick="many_select_trigger();selected_display()" id="many_select_trigger_obj">
+                                <label for="many_select_trigger_obj" id="comment_selected_message">Tümünü Seç</label>
                             </th>
                             <th scope="col">text</th>
                             <th scope="col" style="text-align: center; width: 100px;">ai_tag</th>
@@ -53,7 +53,7 @@
                                         <i class="fa-solid fa-circle-minus"></i>
                                     </button>
                                 </td>
-                                <td onclick="document.getElementById('comment_checkbox_{{ comment.id }}').checked = !document.getElementById('comment_checkbox_{{ comment.id }}').checked ">{{ comment.text }}</td>
+                                <td onclick="document.getElementById('comment_checkbox_{{ comment.id }}').checked = !document.getElementById('comment_checkbox_{{ comment.id }}').checked;selected_display()">{{ comment.text }}</td>
                                 {% if comment.ai_tag %}
                                     <td>{{ comment.ai_tag.name }}</td>
                                 {% else %}
@@ -96,9 +96,25 @@
     function many_select_trigger(){
         var status = document.getElementById('many_select_trigger_obj')
         var comment_area = document.getElementsByClassName('comment_checkbox')
-
         for (let i = 0; i < comment_area.length; i++) {
             comment_area[i].checked = status.checked
+        }
+    }
+
+    function selected_display() {
+
+        var comment_select_display = document.getElementById('comment_selected_message')
+        var comment_area = $('.comment_checkbox')
+        let count = 0
+        for (let i = 0; i < comment_area.length; i++) {
+            if (comment_area[i].checked){
+                count ++
+            }
+        }
+        if (count === 0){
+            comment_select_display.innerText = 'Tümünü Seç'
+        }else {
+            comment_select_display.innerText = 'Tümünü Seç (' + count + ')'
         }
     }
 
