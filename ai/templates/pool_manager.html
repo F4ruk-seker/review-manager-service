@@ -30,7 +30,10 @@
                 <table class="table table-sm table-light table-striped border pb-0 mb-0">
                     <thead>
                         <tr>
-                            <th scope="col">#</th>
+                            <th scope="col">#
+                                <input type="checkbox" onclick="many_select_trigger()" id="many_select_trigger_obj">
+                                <span id="comment_selected_message">Tümünü Seç</span>
+                            </th>
                             <th scope="col">text</th>
                             <th scope="col" style="text-align: center; width: 100px;">ai_tag</th>
                             <th scope="col" style="text-align: center; width: 100px;">tag</th>
@@ -40,11 +43,17 @@
                 </table>
                 <div style="overflow-y: auto;max-height: 50vh">
                     <table class="table table-sm table-light table-striped border">
-                        <tbody>
+                        <tbody id="comment_area">
                         {% for comment in comments %}
-                            <tr id="comment_temp_{{ comment.id }}" onclick="delete_comment('{{ comment.id }}')">
-                                <th scope="row">{{ forloop.counter }}</th>
-                                <td>{{ comment.text }}</td>
+                            <tr id="comment_temp_{{ comment.id }}">
+                                <th scope="row">{{ forloop.counter }}
+                                    <input type="checkbox" class="comment_checkbox" id="comment_checkbox_{{ comment.id }}"></th>
+                                <td>
+                                    <button type="button" class="btn btn-sm btn-light link-danger border my-auto" onclick="delete_comment('{{ comment.id }}')">
+                                        <i class="fa-solid fa-circle-minus"></i>
+                                    </button>
+                                </td>
+                                <td onclick="document.getElementById('comment_checkbox_{{ comment.id }}').checked = !document.getElementById('comment_checkbox_{{ comment.id }}').checked ">{{ comment.text }}</td>
                                 {% if comment.ai_tag %}
                                     <td>{{ comment.ai_tag.name }}</td>
                                 {% else %}
@@ -74,41 +83,69 @@
             <button type="button" class="btn btn-sm btn-outline-info me-1">Ekle </button>
             <button type="button" class="btn btn-sm btn-outline-info me-1">... </button>
             <div class="w-100"></div>
-            <button type="button" class="btn btn-sm btn-outline-danger me-1 px-4">Sil</button>
+            <button type="button" class="btn btn-sm btn-outline-danger me-1 px-4" onclick="many_select_delete()">Sil</button>
         </div>
     </div>
 <script>
+
     function view_selected_tag(tag) {
         console.log('?tag=' + tag + '&?ai=' + document.querySelector("#use_ai").checked)
-        document.location.search = '?tag=' + tag + '&ai=' + document.querySelector("#use_ai").checked
+        document.location.search = '?tag=' + tag + '&' + 'ai=' + document.querySelector("#use_ai").checked
     }
 
+    function many_select_trigger(){
+        var status = document.getElementById('many_select_trigger_obj')
+        var comment_area = document.getElementsByClassName('comment_checkbox')
+
+        for (let i = 0; i < comment_area.length; i++) {
+            comment_area[i].checked = status.checked
+        }
+    }
+
+    function many_select_delete() {
+        {#var comment_area = document.getElementsByClassName('comment_checkbox')#}
+        var comment_area = $('.comment_checkbox')
+
+        for (let i = 0; i < comment_area.length; i++) {
+            if (comment_area[i].checked){
+                delete_comment(comment_area[i].parentElement.parentElement.id.replace('comment_temp_', ''))
+            }
+        }
+    }
+
+    function delete_selected_comments(){
+
+    }
     function delete_comment(id) {
         var pool_id = "{{ pool.id }}"
         var apiUrl = document.location.origin + '/api/ai/tool/pool/'+ pool_id + '/comment/' + id + '/'
+
         $('#comment_temp_' + id + ' th').css('color', 'cyan');
         $('#comment_temp_' + id + ' td').css('color', 'cyan');
 
-        $.ajax({
-        url: apiUrl,
-        type:"DELETE",
-        dataType: 'json',
-        headers: {
-            'X-CSRFToken': '{{ csrf_token }}'
-        },
+        if ($('#comment_temp_'+id).css('display') !== 'none'){
+            $.ajax({
+                url: apiUrl,
+                type:"DELETE",
+                dataType: 'json',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
 
-        success:function (response) {
+                success:function (response) {
+                   $('#'+'comment_temp_'+id).fadeOut('slow')
+                    document.getElementById('comment_checkbox_' + id).checked = false
 
-
-            $('#'+'comment_temp_'+id).fadeOut('slow')
-        },
-        error: function(response){
-            $('#comment_temp_' + id + ' th').css('color', 'red');
-            $('#comment_temp_' + id + ' td').css('color', 'red');
-
-            console.log(response)
+                },
+                error: function(response){
+                    $('#comment_temp_' + id + ' th').css('color', 'red');
+                    $('#comment_temp_' + id + ' td').css('color', 'red');
+                    console.log(response)
+                }
+            })
+        }else {
+            console.log('object already removed')
         }
-        })
     }
 </script>
 {% endblock %}
