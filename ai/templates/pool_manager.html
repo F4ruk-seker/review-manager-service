@@ -15,7 +15,7 @@
     </style>
     <div class="card py-2 px-3">
         <h4 class="display-6 text-dark">Pool : {{ pool.name }}</h4>
-        <p class="p-6 text-danger">id : {{ pool.id }}</p>
+        <button class="p-6 text-danger btn btn-sm btn-link" style="text-align: left" onclick="navigator.clipboard.writeText('{{ pool.id }}');">id : {{ pool.id }} <i class="fa-regular fa-copy"></i></button>
         <hr class="text-dark">
 
         <div class="d-flex grid">
@@ -81,7 +81,6 @@
                     </table>
                 </div>
                     <p class="m-0 mt-1"> this table has <span class="text-info fw-semibold"> {{ comments.count }} </span> comment </p>
-
             </div>
         {% else %}
             <div class="alert alert-info">Here Empty</div>
@@ -98,7 +97,7 @@
         </div>
     </div>
 
-<script>
+<script>""
     function view_selected_tag(tag) {
         console.log('?tag=' + tag + '&?ai=' + document.querySelector("#use_ai").checked)
         document.location.search = '?tag=' + tag + '&' + 'ai=' + document.querySelector("#use_ai").checked

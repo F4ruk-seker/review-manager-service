@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="card text-center">
+    <div class="card-header d-flex justify-content-between">
+        Pool List
+    </div>
+    <div class="card-body">
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Name</th>
+            <th scope="col">ID</th>
+            <th scope="col">actions</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for pool in pool_list %}
+        <tr>
+            <th scope="row">{{ forloop.counter }}</th>
+            <td>{{ pool.name }}</td>
+            <td><a class="btn-link link-danger" href="{{ request.path }}{{ pool.id }}">{{ pool.id }}</a></td>
+            <td>@mdo</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+    </div>
+
+        <div class="card-footer text-body-secondary text-left">
+        Output service v1
+        </div>
+</div>
+{% endblock %}

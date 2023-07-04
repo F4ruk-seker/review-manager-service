@@ -16,7 +16,11 @@ from ai.functions.output import generate_output_file_name
 def ai_main(request):
     return render(request, 'base.html')
 
-
+def pool_list_view(request):
+    pool_list: list[models.CommentPool] = models.CommentPool.objects.all()
+    return render(request, 'pool_list.html', context={
+        'pool_list': pool_list
+    })
 def pool_manager(request, pool_id):
 
     pool: models.CommentPool = models.CommentPool.objects.filter(id=pool_id).first()
