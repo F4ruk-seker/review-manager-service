@@ -11,7 +11,8 @@ from comment.models import CommentTag
 
 
 from ai.functions import output as output_functions
-from ai.functions.output.output_file_name import generate_output_file_name
+from ai.functions.output import generate_output_file_name
+
 def ai_main(request):
     return render(request, 'base.html')
 
@@ -61,41 +62,3 @@ class PoolOutput(View):
             return render_func(pool, comment_list)
         else:
             raise Http404
-        # if file_type == 'json':
-        #     return render_json_comment(comment_list)
-        # # try:
-        #     rw = self.model.objects.get(slug=slug)
-        #     if data_type == 'json':
-        #         data = []
-        #         for comment in rw.get_comments():
-        #             value = {"comment": comment.comment, }
-        #             if comment.tag == None:
-        #                 value["tag"] = None
-        #             else:
-        #                 value["tag"] = comment.tag.name
-        #             data.append(json.dumps(value))
-        #         response = shortcuts.HttpResponse(str(data), content_type='application/vnd.ms-json')
-        #         response['Content-Disposition'] = f'attachment; filename="{slug}.json"'
-        #         return response
-        #     elif data_type == 'xlsx':
-        #         with BytesIO() as b:
-        #             # Use the StringIO object as the filehandle.
-        #             writer = pd.ExcelWriter(b, engine='xlsxwriter')
-        #             df = pd.DataFrame({
-        #                 'comments': [comment.comment for comment in rw.get_comments()],
-        #                 'tag': [comment.tag for comment in rw.get_comments()]
-        #             })
-        #             df.to_excel(writer, sheet_name=slug)
-        #             writer.save()
-        #             # Set up the Http response.
-        #             filename = f'{slug}.xlsx'
-        #             response = shortcuts.HttpResponse(
-        #                 b.getvalue(),
-        #                 content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-        #             )
-        #             response['Content-Disposition'] = 'attachment; filename=%s' % filename
-        #             return response
-        #     else:
-        #         raise shortcuts.Http404
-        # except:
-        #     return HttpResponseNotFound('<h1>File not exist</h1>')

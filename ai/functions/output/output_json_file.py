@@ -1,6 +1,6 @@
 from django.shortcuts import HttpResponse
 from ai.models import CommentPool
-from ai.functions.output.output_file_name import generate_output_file_name
+from .output_file_name import generate_output_file_name
 from comment.models import CommentModel
 import json
 

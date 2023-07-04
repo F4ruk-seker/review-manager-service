@@ -1,7 +1,8 @@
 from django.http import HttpResponse
 from xml.etree.ElementTree import Element, ElementTree
 
-from ai.functions.output.output_file_name import generate_output_file_name
+from .output_file_name import generate_output_file_name
+
 from ai.models import CommentPool
 from comment.models import CommentModel
 
