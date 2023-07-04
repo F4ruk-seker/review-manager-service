@@ -15,6 +15,7 @@ urlpatterns = [
     # path('add-AI/', views.AICreateView.as_view()),
     # path('remove-AI/', views.AIMetricCreateView.as_view()),
     # path('tool/pool/comment/')
-    path('tool/pool/<pool_id>/comment/', views.PoolCommentManyRemove.as_view()),
+    path('tool/pool/', views.PoolListSearchView.as_view()),
+    path('tool/pool/<pk>/', views.PoolCommentList.as_view()),
     path('tool/pool/<pool_id>/comment/<comment_id>/', views.PoolCommentAddRemove.as_view())
 ]
