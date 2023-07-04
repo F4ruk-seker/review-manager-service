@@ -9,6 +9,13 @@ class CommentModel(models.Model):
     tag = models.ForeignKey('CommentTag', on_delete=models.SET_NULL, null=True, blank=True,related_name="human_tag")
     branch_from = models.ForeignKey('branch.BranchModel', on_delete=models.SET_NULL, null=True, blank=True)
 
+    def get_as_json(self) -> dict:
+        return {
+            'text': self.text,
+            'ai_tag': self.ai_tag.name if self.ai_tag else None,
+            'tag': self.tag.name if self.tag else None,
+        }
+
 
 class CommentTag(models.Model):
     name = models.TextField()

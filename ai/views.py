@@ -1,19 +1,24 @@
 from django.shortcuts import render
 from django.shortcuts import get_object_or_404
+from django.shortcuts import Http404
 from django.db.models.query import Q
+from django.views.generic import View
 
 from ai import models
 from comment.models import CommentTag
+
 # Create your views here.
 
 
+from ai.functions import output as output_functions
+from ai.functions.output.output_file_name import generate_output_file_name
 def ai_main(request):
     return render(request, 'base.html')
 
 
-def pool_manager(request):
+def pool_manager(request, pool_id):
 
-    pool: models.CommentPool = models.CommentPool.objects.first()
+    pool: models.CommentPool = models.CommentPool.objects.filter(id=pool_id).first()
     tag = request.GET.get('tag', None)
     ai = request.GET.get('ai', None)
     comment = pool.comments.all()
@@ -31,3 +36,66 @@ def pool_manager(request):
         'comments': comment
     })
 
+
+class PoolOutput(View):
+
+    def get(self, request, pool_id, *args, **kwargs):
+        pool: models.CommentPool = get_object_or_404(models.CommentPool, id=pool_id)
+        output_file_name: str = generate_output_file_name(pool.id, '', 'pool')
+        return render(request, 'download_modal.html', context={
+            'output_file_name': output_file_name
+        })
+
+    def post(self, request, pool_id, *args, **kwargs):
+        pool: models.CommentPool = get_object_or_404(models.CommentPool, id=pool_id)
+        comment_list: list = pool.comments.all()
+
+        file_type: str = request.POST.get('file_type')
+
+        file_type_functions: dict = {
+            'json': output_functions.get_rendered_json_file_response,
+            'excel': output_functions.get_rendered_excel_file_response,
+            'xml': output_functions.get_rendered_xml_file_response,
+        }
+        if render_func := file_type_functions.get(file_type):
+            return render_func(pool, comment_list)
+        else:
+            raise Http404
+        # if file_type == 'json':
+        #     return render_json_comment(comment_list)
+        # # try:
+        #     rw = self.model.objects.get(slug=slug)
+        #     if data_type == 'json':
+        #         data = []
+        #         for comment in rw.get_comments():
+        #             value = {"comment": comment.comment, }
+        #             if comment.tag == None:
+        #                 value["tag"] = None
+        #             else:
+        #                 value["tag"] = comment.tag.name
+        #             data.append(json.dumps(value))
+        #         response = shortcuts.HttpResponse(str(data), content_type='application/vnd.ms-json')
+        #         response['Content-Disposition'] = f'attachment; filename="{slug}.json"'
+        #         return response
+        #     elif data_type == 'xlsx':
+        #         with BytesIO() as b:
+        #             # Use the StringIO object as the filehandle.
+        #             writer = pd.ExcelWriter(b, engine='xlsxwriter')
+        #             df = pd.DataFrame({
+        #                 'comments': [comment.comment for comment in rw.get_comments()],
+        #                 'tag': [comment.tag for comment in rw.get_comments()]
+        #             })
+        #             df.to_excel(writer, sheet_name=slug)
+        #             writer.save()
+        #             # Set up the Http response.
+        #             filename = f'{slug}.xlsx'
+        #             response = shortcuts.HttpResponse(
+        #                 b.getvalue(),
+        #                 content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        #             )
+        #             response['Content-Disposition'] = 'attachment; filename=%s' % filename
+        #             return response
+        #     else:
+        #         raise shortcuts.Http404
+        # except:
+        #     return HttpResponseNotFound('<h1>File not exist</h1>')

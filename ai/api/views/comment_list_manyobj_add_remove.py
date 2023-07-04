@@ -11,7 +11,6 @@ class PoolCommentManyRemove(APIView):
 
     def delete(self, request, pool_id):
         pool: CommentPool = self.get_pool(pool_id)
-        print(request)
         comment: CommentModel = self.get_comment_from_pool(pool, '1')
         if comment:
             pool.comments.remove(comment)

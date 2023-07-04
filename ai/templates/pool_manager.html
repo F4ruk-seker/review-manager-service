@@ -3,6 +3,16 @@
 
 
 {% block content %}
+    <style>
+    .show_download{
+        opacity: 1;
+        display: flex;
+    }
+    .fade:not(.show_download) {
+        opacity: 0;
+        display: none;
+    }
+    </style>
     <div class="card py-2 px-3">
         <h4 class="display-6 text-dark">Pool : {{ pool.name }}</h4>
         <p class="p-6 text-danger">id : {{ pool.id }}</p>
@@ -78,14 +88,16 @@
         {% endif %}
     </div>
     <hr>
+
     <div class="card p-3">
         <div class="d-flex">
             <button type="button" class="btn btn-sm btn-outline-info me-1">Ekle </button>
-            <button type="button" class="btn btn-sm btn-outline-info me-1">... </button>
+            <a class="btn btn-sm btn-outline-info me-1" href="{{ request.path }}output/">Download</a>
             <div class="w-100"></div>
             <button type="button" class="btn btn-sm btn-outline-danger me-1 px-4" onclick="many_select_delete()">Sil</button>
         </div>
     </div>
+
 <script>
     function view_selected_tag(tag) {
         console.log('?tag=' + tag + '&?ai=' + document.querySelector("#use_ai").checked)
@@ -101,7 +113,6 @@
     }
 
     function selected_display() {
-
         var comment_select_display = document.getElementById('comment_selected_message')
         var comment_area = $('.comment_checkbox:checked')
         if (comment_area.length === 0){
@@ -119,9 +130,6 @@
         }
     }
 
-    function delete_selected_comments(){
-
-    }
     function delete_comment(id) {
         var pool_id = "{{ pool.id }}"
         var apiUrl = document.location.origin + '/api/ai/tool/pool/'+ pool_id + '/comment/' + id + '/'
