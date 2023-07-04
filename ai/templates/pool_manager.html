@@ -3,16 +3,6 @@
 
 
 {% block content %}
-    <style>
-    .show_download{
-        opacity: 1;
-        display: flex;
-    }
-    .fade:not(.show_download) {
-        opacity: 0;
-        display: none;
-    }
-    </style>
     <div class="card py-2 px-3">
         <h4 class="display-6 text-dark">Pool : {{ pool.name }}</h4>
         <button class="p-6 text-danger btn btn-sm btn-link" style="text-align: left" onclick="navigator.clipboard.writeText('{{ pool.id }}');">id : {{ pool.id }} <i class="fa-regular fa-copy"></i></button>
@@ -20,7 +10,7 @@
 
         <div class="d-flex grid">
 
-            <button type="button" onclick="view_selected_tag('')" class="btn btn-sm btn-outline-info me-1">Tümü <span style="color:red">({{ pool.comments.count }})</span></button>
+            <button type="button" onclick="document.location.search = ''" class="btn btn-sm btn-outline-info me-1">Tümü <span style="color:red">({{ pool.comments.count }})</span></button>
             <div class="btn btn-sm btn-outline-success me-1">
                 {% if request.GET.ai == 'true' %}
                     <input type="checkbox" id="use_ai" checked>
@@ -30,7 +20,7 @@
                 <label for="use_ai">AI tagları dahil et</label>
             </div>
             {% for stat in pool.get_colored_stats.items %}
-                <button type="button" onclick="view_selected_tag('{{ stat.0 }}')" class="btn btn-sm btn-outline-{{ stat.1.color }} me-1">{{ stat.0 }} <span style="color:red">({{ stat.1.count }})</span></button>
+                <button type="button" onclick="document.location.search = '?tag=' + '{{ stat.0 }}'" class="btn btn-sm btn-outline-{{ stat.1.color }} me-1">{{ stat.0 }} <span style="color:red">({{ stat.1.count }})</span></button>
             {% endfor %}
 
         </div>
@@ -39,15 +29,14 @@
             <div class="mb-2" >
                 <table class="table table-sm table-light table-striped border pb-0 mb-0">
                     <thead>
-                        <tr>
-                            <th scope="col">#
+                        <tr class="pe-5">
+                            <th scope="col" style="width: 200px">#
                                 <input type="checkbox" onclick="many_select_trigger();selected_display()" id="many_select_trigger_obj">
                                 <label for="many_select_trigger_obj" id="comment_selected_message">Tümünü Seç</label>
                             </th>
-                            <th scope="col">text</th>
-                            <th scope="col" style="text-align: center; width: 100px;">ai_tag</th>
-                            <th scope="col" style="text-align: center; width: 100px;">tag</th>
-                            <th scope="col" style="text-align: center; width: 100px;">branch</th>
+                            <th scope="col" style="text-align: center;padding-right: 20px">text</th>
+                            <th scope="col" style="text-align: left; width: 100px;">tag</th>
+                            <th scope="col" style="text-align: left; width: 100px;">branch</th>
                         </tr>
                     </thead>
                 </table>
@@ -64,17 +53,12 @@
                                     </button>
                                 </td>
                                 <td onclick="document.getElementById('comment_checkbox_{{ comment.id }}').checked = !document.getElementById('comment_checkbox_{{ comment.id }}').checked;selected_display()">{{ comment.text }}</td>
-                                {% if comment.ai_tag %}
-                                    <td>{{ comment.ai_tag.name }}</td>
-                                {% else %}
-                                    <td class="text-secondary">Tanımsız</td>
-                                {% endif %}
                                 {% if comment.tag %}
-                                    <td>{{ comment.tag.name }}</td>
+                                    <td style="width: 100px;">{{ comment.tag.name }}</td>
                                 {% else %}
-                                    <td class="text-secondary">Tanımsız</td>
+                                    <td class="text-secondary" style="width: 100px;">Tanımsız</td>
                                 {% endif %}
-                                <td>{{ comment.branch_from.name }}</td>
+                                <td style="width: 100px;">{{ comment.branch_from.name }}</td>
                             </tr>
                         {% endfor %}
                         </tbody>
@@ -97,10 +81,9 @@
         </div>
     </div>
 
-<script>""
+<script>
     function view_selected_tag(tag) {
-        console.log('?tag=' + tag + '&?ai=' + document.querySelector("#use_ai").checked)
-        document.location.search = '?tag=' + tag + '&' + 'ai=' + document.querySelector("#use_ai").checked
+        document.location.search = '?tag=' + tag
     }
 
     function many_select_trigger(){
