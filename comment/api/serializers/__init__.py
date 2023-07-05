@@ -1,3 +1,3 @@
-from .comment_serializers import CommentSerializer
+from .comment_serializers import CommentSerializer, CustomizedCommentBranchSerializer
 from .comment_tag_serializers import CommentTagSerializer
 

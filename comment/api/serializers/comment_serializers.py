@@ -7,6 +7,13 @@ from .comment_tag_serializers import CommentTagSerializer
 
 class CommentSerializer(serializers.ModelSerializer):
 
+
+    class Meta:
+        model = CommentModel
+        fields = '__all__'
+
+
+class CustomizedCommentBranchSerializer(CommentSerializer):
     ai_tag = CommentTagSerializer()
     tag = CommentTagSerializer()
 
@@ -19,8 +26,3 @@ class CommentSerializer(serializers.ModelSerializer):
             'id': comment_obj.branch_from.id if comment_obj.branch_from else None,
             'name': comment_obj.branch_from.name if comment_obj.branch_from else None
         }
-
-
-    class Meta:
-        model = CommentModel
-        fields = '__all__'

@@ -4,21 +4,13 @@
 
 {% block content %}
     <div class="card py-2 px-3">
-        <h4 class="display-6 text-dark">Pool : {{ pool.name }}</h4>
+        <h4 class="text-dark">Pool : {{ pool.name }}</h4>
         <button class="p-6 text-danger btn btn-sm btn-link" style="text-align: left" onclick="navigator.clipboard.writeText('{{ pool.id }}');">id : {{ pool.id }} <i class="fa-regular fa-copy"></i></button>
         <hr class="text-dark">
 
         <div class="d-flex grid">
 
             <button type="button" onclick="document.location.search = ''" class="btn btn-sm btn-outline-info me-1">Tümü <span style="color:red">({{ pool.comments.count }})</span></button>
-            <div class="btn btn-sm btn-outline-success me-1">
-                {% if request.GET.ai == 'true' %}
-                    <input type="checkbox" id="use_ai" checked>
-                {% else %}
-                    <input type="checkbox" id="use_ai">
-                {% endif %}
-                <label for="use_ai">AI tagları dahil et</label>
-            </div>
             {% for stat in pool.get_colored_stats.items %}
                 <button type="button" onclick="document.location.search = '?tag=' + '{{ stat.0 }}'" class="btn btn-sm btn-outline-{{ stat.1.color }} me-1">{{ stat.0 }} <span style="color:red">({{ stat.1.count }})</span></button>
             {% endfor %}
@@ -78,15 +70,15 @@
     <div class="card p-3">
         <div class="d-flex">
             <button type="button" class="btn btn-sm btn-outline-info me-1">Ekle </button>
-            <a class="btn btn-sm btn-outline-info me-1" href="{{ request.path }}output/">Download</a>
+            <a class="btn btn-sm btn-outline-info me-1 d-flex" href="{{ request.path }}output/">Download <i class="fa-solid fa-download my-auto ms-1"></i></a>
             <div class="w-100"></div>
             <button type="button" class="btn btn-sm btn-outline-danger me-1 px-4" onclick="many_select_delete()">Sil</button>
         </div>
     </div>
-    <hr>
+
+
 
 {{ comments | json_script:'comment_list' }}
-
 
 <script>
     function select_all_this_branch_comments(branch) {

@@ -1,6 +1,6 @@
 from .pool_output import PoolOutput
 from .pool_list_view import PoolView
-from comment.api.serializers import CommentSerializer
+from comment.api.serializers import CustomizedCommentBranchSerializer
 
 from django.views.generic import ListView
 from django.views.generic import DetailView
@@ -40,8 +40,7 @@ class PoolManager(DetailView):
             else:
                 tag = get_object_or_404(CommentTag, name=tag)
                 comments = self.object.comments.filter(Q(tag=tag))
-
-        context['comments'] = [CommentSerializer(comment).data for comment in comments]
+        context['comments'] = [CustomizedCommentBranchSerializer(comment).data for comment in comments]
         return context
 
 def pool_manager(request, pool_id):
