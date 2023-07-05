@@ -1,6 +1,7 @@
 from ai.models import CommentPool
 from rest_framework import serializers
 from comment.api.serializers import CommentSerializer
+from branch.models import BranchModel
 
 
 class PoolSerializer(serializers.ModelSerializer):
@@ -8,7 +9,7 @@ class PoolSerializer(serializers.ModelSerializer):
     class Meta:
         model = CommentPool
         # fields = '__all__'
-        exclude = ('comments',)
+        exclude = ('comments', )
 
 
 class PoolCommentSerializer(serializers.ModelSerializer):

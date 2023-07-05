@@ -36,14 +36,14 @@
                             </th>
                             <th scope="col" style="text-align: center;padding-right: 20px">text</th>
                             <th scope="col" style="text-align: left; width: 100px;">tag</th>
-                            <th scope="col" style="text-align: left; width: 100px;">branch</th>
+                            <th scope="col" style="text-align: left; width: 100px;">branch <i class="fa-solid fa-link"></i></th>
                         </tr>
                     </thead>
                 </table>
                 <div style="overflow-y: auto;max-height: 50vh">
                     <table class="table table-sm table-light table-striped border">
                         <tbody id="comment_area">
-                        {% for comment in comments %}
+                      {% for comment in comments %}
                             <tr id="comment_temp_{{ comment.id }}">
                                 <th scope="row">{{ forloop.counter }}
                                     <input type="checkbox" class="comment_checkbox" id="comment_checkbox_{{ comment.id }}"></th>
@@ -58,7 +58,10 @@
                                 {% else %}
                                     <td class="text-secondary" style="width: 100px;">Tanımsız</td>
                                 {% endif %}
-                                <td style="width: 100px;">{{ comment.branch_from.name }}</td>
+                                <td class="branch-select-row link-secondary fw-semibold" style="width: 100px;"
+                                    value="{{ comment.branch_from.id }}"
+                                    ondblclick="select_all_this_branch_comments('{{ comment.branch_from.id }}')"
+                                >{{ comment.branch_from.name }}</td>
                             </tr>
                         {% endfor %}
                         </tbody>
@@ -80,8 +83,22 @@
             <button type="button" class="btn btn-sm btn-outline-danger me-1 px-4" onclick="many_select_delete()">Sil</button>
         </div>
     </div>
+    <hr>
+
+{{ comments | json_script:'comment_list' }}
+
 
 <script>
+    function select_all_this_branch_comments(branch) {
+        var branch_list = document.querySelectorAll("td.branch-select-row")
+
+        for (let i = 0; i < branch_list.length; i++) {
+            branch_list[i].parentElement.querySelector('input').checked = branch_list[i].getAttribute('value') == branch
+        }
+
+        selected_display()
+    }
+
     function view_selected_tag(tag) {
         document.location.search = '?tag=' + tag
     }
