@@ -1,2 +1,2 @@
-from .branch_manage_view import BranchManager
+from .branch_manage_view import BranchListView, BranchManager
 
