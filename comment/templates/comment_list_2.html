@@ -1,0 +1,174 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% verbatim %}
+<div class="card py-2 px-3">
+    <h4 class="text-dark">All Comment</h4>
+    <p> All Comment </p>
+
+    <header v-show="comment_list.length > 0">
+
+    <hr class="text-dark">
+
+    <div class="d-flex grid">
+
+        <button type="button" onclick="document.location.search = ''" class="btn btn-sm btn-outline-info me-1">Tümü <span style="color:red">({{ comment_list.length }})</span></button>
+            <button v-for="tag in tags" type="button" :class="'btn btn-sm btn-outline-' + tag.color.replace('btn-', '') + ' me-1'">{{ tag.name }} <span style="color:red">({{ tag.count }})</span></button>
+            <span style="width: 10px"></span>
+            <button type="button" class="btn btn-sm btn-outline-dark me-1">Tanımsız <span style="color:red">({{ un_tag_count }})</span></button>
+
+    </div>
+    <hr class="text-dark">
+    </header>
+    <section v-show="comment_list.length > 0" >
+        <table class="table table-sm table-light table-striped border pb-0 mb-0">
+            <thead>
+                <tr class="pe-5">
+                    <th scope="col" style="width: 200px">#
+                        <input type="checkbox" onclick="many_select_trigger();selected_display()" id="many_select_trigger_obj">
+                        <label for="many_select_trigger_obj" id="comment_selected_message">Tümünü Seç</label>
+                    </th>
+                    <th scope="col" style="text-align: center;padding-right: 20px">text</th>
+                    <th scope="col" style="text-align: left; width: 100px;">tag</th>
+                    <th scope="col" style="text-align: left; width: 100px;">branch <i class="fa-solid fa-link"></i></th>
+                </tr>
+            </thead>
+        </table>
+        <div style="overflow-y: auto;max-height: 50vh">
+            <table class="table table-sm table-light table-striped border mb-0 ">
+                <tbody id="comment_area">
+                    <tr v-for="(comment, index) in comment_list">
+                        <th scope="row" :id="'comment_temp_' + comment.id">{{ index + 1 }}
+                            <input type="checkbox" class="comment_checkbox" :id="'comment_checkbox_' + comment.id ">
+                        </th>
+                        <td o="selected_display()">
+                            <button type="button" class="btn btn-sm btn-light link-danger border my-auto" onclick="delete_comment('{ comment.id }')">
+                                <i class="fa-solid fa-circle-minus"></i>
+                            </button>
+                        </td>
+                        <td  @click="change_checkbox_status(comment.id)" :key="comment.id">{{ comment.text }}</td>
+                    <td v-if="comment.tag" style="width: 100px;">{{ comment.tag.name }}</td>
+                    <td v-else="comment.tag" class="text-secondary" style="width: 100px;">Tanımsız</td>
+                        <td class="branch-select-row link-secondary fw-semibold" style="width: 100px;"
+                            value="{ comment.branch_from.id }"
+                            @click="select_all_this_branch_comments(comment.branch_from.id)"
+                        >
+                            <p v-if="comment.branch_from" class="m-0">{{ comment.branch_from.name }}</p>
+                            <p v-else class="m-0 text-secondary">Tanımsız</p>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <footer v-show="comment_list.length > 0">
+        <p class="m-0 mt-1"> this table has <span class="text-info fw-semibold"> {{ comment_list.length }} </span> comment </p>
+    </footer>
+
+    <section v-show="comment_list.length == 0" class="alert alert-info mb-2">Here Empty</section>
+</div>
+<hr>
+
+<div class="card p-3">
+    <div class="d-flex">
+        <button type="button" class="btn btn-sm btn-outline-info me-1">Ekle </button>
+        <a class="btn btn-sm btn-outline-info me-1 d-flex" href="{ request.path }output/">Download <i class="fa-solid fa-download my-auto ms-1"></i></a>
+        <div class="w-100"></div>
+        <button type="button" class="btn btn-sm btn-outline-danger me-1 px-4" onclick="many_select_delete()">Sil</button>
+    </div>
+</div>
+
+{% endverbatim %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+    new Vue({
+        el:'#main',
+        data:{
+            comment_list:[],
+            tags:[],
+            un_tag_count: 0
+        },
+        methods: {
+        async fetch_load_comment_list_from_api(){
+            try {
+                var url = 'http://127.0.0.1:8000/api/comment/'
+                const response = await fetch(url);
+                const data = await response.json();
+                this.comment_list = data
+                console.log(data)
+            }catch (error){
+                this.tags = []
+                console.log(error)
+            }
+        },
+        async fetchTagData(){
+            try {
+                var url = 'http://127.0.0.1:8000/api/comment/tag/'
+                const response = await fetch(url);
+                const data = await response.json();
+                var temp_list = []
+                for (let i = 0; i < data.length; i++) {
+                    if (data[i].id){
+                        var d = data[i]
+                        d.color = 'btn-' + data[i].color
+                        temp_list.push(d)
+                    }
+                }
+                this.tags = temp_list;
+            }catch (error){
+                this.tags = []
+                console.log(error)
+            }
+        },
+        change_checkbox_status(id){
+            document.getElementById('comment_checkbox_' + id).checked =! document.getElementById('comment_checkbox_' + id).checked
+        },
+        set_checkbox_status(id, status){
+            document.getElementById('comment_checkbox_' + id).checked = status
+        },
+        select_all_this_branch_comments(branch){
+            for (let i = 0; i < this.comment_list.length; i++) {
+                comment_brnach = this.comment_list[i].branch_from
+                if (comment_brnach){
+                    if (comment_brnach.id === branch){
+                        this.set_checkbox_status(this.comment_list[i].id, true)
+                    }
+                }
+            }
+        },
+        async get_stats_with_tag(){
+            var temp_list = []
+            let un_tag_caount = 0
+            for (let tagi = 0; tagi < this.tags.length; tagi++) {
+                let counter = 0
+                for (let comi = 0; comi < this.comment_list.length; comi++) {
+                    if (this.comment_list[comi].tag !== null){
+                        if (this.tags[tagi].id === this.comment_list[comi].tag.id){
+                            counter ++
+                        }
+                    } else {
+                        un_tag_caount ++
+                    }
+                }
+                var obj = this.tags[tagi]
+                obj.count = counter
+                temp_list.push(obj)
+            }
+            this.un_tag_count = un_tag_caount
+            this.tags = temp_list
+        },
+        async collect_data(){
+            await this.fetch_load_comment_list_from_api()
+            await this.fetchTagData()
+            await this.get_stats_with_tag()
+        },
+    },
+        mounted(){
+            this.collect_data()
+        }
+    })
+</script>
+{% endblock %}

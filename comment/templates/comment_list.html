@@ -1,0 +1,192 @@
+{% extends 'base.html' %}
+{% block title %} {% endblock %}
+{% block content %}
+<div class="container d-flex rounded border">
+    <div class="col my-auto">
+    <strong class="text-success fw-bold  heading-text h1">{{ database_detail.name }}</strong>
+    <h4> Items : {{ database_detail.get_comment_count }}</h4>
+    <p>
+        Açıklama :
+        <code>
+            {{ database_detail.explanation }}
+        </code>
+    </p>
+    </div>
+    <ul class="col-lg-6 col-sm-6 mt-2 row list-group-horizontal-sm overflow-auto " style="height: 14vh">
+    {% for tag_key,tag_value in database_detail.tag.items %}
+        <li class="border list-group-item ps-2">
+            <td>
+                <td>{{ tag_key }} </td>
+                <td>{{ tag_value }}</td>
+            </td>
+        </li>
+    {% endfor %}
+    </ul>
+</div>
+<div class="container d-flex p-0">
+    <hr class="w-100 me-2">
+    <input type="checkbox" id="show_deleted" onchange="if(window.location.href.endsWith('?show_deleted=true')){window.location.replace(window.location.href.toString().replace('?show_deleted=true',''));}else{document.getElementById('show_deleted_comments').click()}">
+    <label class="d-block my-auto ps-2" style="min-width: 112px" for="show_deleted">Show Deleted</label>
+    <a style="display: none" href="/?show_deleted=true" id="show_deleted_comments"></a>
+    <script>
+        if (window.location.href.endsWith('?show_deleted=true')){
+            document.getElementById('show_deleted').checked = true;
+        }
+        document.getElementById('show_deleted_comments').href = window.location.href + '?show_deleted=true'
+    </script>
+</div>
+<div class="container overflow-auto " style="height: 60vh">
+<table class="table table-sm table-light table-striped ">
+{#    {{ data_list.get_comments }}#}
+    {% for data in data_list %}
+        {% if forloop.counter0 == 0 %}
+            <thead>
+                <tr>
+                <th scope="col">Row</th>
+                {% for key, value in data.get_variables.items %}
+                    {% if key not in '["tag","modified_by","tag_id","id"]' %}
+                        <th scope="col">{{ key }}</th>
+                    {% endif %}
+                {% endfor %}
+                    <th scope="col">modifiedBy</th>
+                    <th scope="col">Tag</th>
+                    <th scope="col">Actions</th>
+                </tr>
+            </thead>
+        <tbody>
+        {% endif %}
+            <tr id="dataRow{{ data.id }}">
+
+            <td class="border text-secondary">{{ data.id }}</td>
+{#            <td class="border text-secondary">{{ data.modified_by }}</td>#}
+            {% for key, value in data.get_variables.items %}
+                {% if key not in '["tag","modified_by","tag_id","id"]' %}
+                    {% if forloop.counter0 == 0 %}
+                        <th scope="row">{{ value }}</th>
+                    {% else %}
+                        <td>{{ value }}</td>
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+            <td class="border">
+                {% if data.modified_by %}
+                    <div id="modBy{{ data.id }}">
+                        <a class="link-dark fw-semibold text-decoration-none">{{ data.get_variables.modified_by }}</a>
+                    </div>
+                {% else %}
+                    <div id="modBy{{ data.id }}">
+                        <p class="text-secondary">None</p>
+                    </div>
+                {% endif %}
+            </td>
+
+            <td class="border">
+                <select id="{{ data.id }}"  class="form-select form-select-sm" style="min-width: 100px" onchange='set_and_update_tag(id=this.id,this.value)'>
+                    {% if data.tag %}
+                        <option class="text-success fw-semibold" value="-1">{{ data.tag }}</option>
+                        <hr>
+                    {% else %}
+                        <option class="text-danger" value="-1">---TAG---</option>
+                    {% endif %}
+                    {% for tag in tag_list %}
+                         <option id="test" value="{{ tag.id }}">{{ tag.name }}</option>
+                    {% endfor %}
+                </select>
+            </td>
+            <td class="border" >
+                <div class="d-flex">
+{#                    <a class="btn btn-light" href="{% url 'Data:comment_edit' data.id %}"><i class="fa-solid fa-pen-to-square"></i></a>#}
+                    <a class="btn btn-light" href="#"><i class="fa-solid fa-pen-to-square"></i></a>
+                    <button class="btn btn-light" onclick="remove_comment('{{ data.id }}')"><i class="fa-solid fa-trash"></i></button>
+                </div>
+            </td>
+        </tr>
+    {% empty %}
+        <h2>Alert : (debug on data temp) : data yok</h2>
+    {% endfor %}
+    </tbody>
+</table>
+</div>
+    <hr class="container">
+<div class="container clearfix">
+
+<div class="float-start">
+    <div class="overflow-auto" style="width: 500px;height: 8vh">
+        <div class="m-0 p-0" id="log">None</div>
+    </div>
+</div>
+    <a href="#" class="btn btn-primary float-end ms-2" >json</a>
+    <a href="#" class="btn btn-primary float-end ms-2" >excel</a>
+{#    <a class="btn btn-primary float-end ms-2" href="{% url 'Data:download_data' database_detail.slug 'xlsx' %}">Veriyi excel olarak al</a>#}
+{#    <a class="btn btn-success float-end ms-2" href="{% url 'Data:download_data' database_detail.slug 'json' %}">Veriyi json olarak al</a>#}
+</div>
+    <hr class="container">
+<div class="container text-center mb-2"><strong>{{ request.user.username }}</strong></div>
+<script>
+function set_and_update_tag(id,tag){
+    if (tag !== '-1'){
+        var apiUrl = "";
+    var url = window.location.href.toString().replace('?show_deleted=true','')
+    if (url.endsWith('/')){
+         apiUrl = url + 'set_tag/'+ id
+    }else {
+         apiUrl = url + '/set_tag/'+ id
+   }
+    var logBar = document.getElementById('log')
+    var updater_field = document.getElementById('modBy'+id)
+    updater_field.innerHTML = `<p class="link-info">ON CHANGE</p>`;
+    $.ajax({
+    url: apiUrl,
+    type:"POST",
+    dataType: 'json',
+        data:{'csrfmiddlewaretoken':'{{ csrf_token }}','tag':tag},
+    success:function (response) {
+        var id_name = 'modByAnim' + id.toString()
+        updater_field.innerHTML = `<a class="link-dark fw-semibold text-decoration-none" id="${id_name}" href="/profile/${response.update_by.toString()}" style="display: none">${response.update_by.toString()}</a>`
+        logBar.innerHTML += response.message.toString() + "<br>"
+        $('#'+id_name).fadeIn('slow')
+    },
+    error: function(response){
+        logBar.innerHTML += response.message.toString() + "<br>"
+    }})
+    logBar.scrollTop = logBar.scrollHeight
+    {#logBar#}
+    }else {
+        console.log('err : Varsayılan seçilemez')
+    }
+}
+
+</script>
+<script>
+
+function remove_comment(id){
+    var apiUrl = "";
+    var url = window.location.href.toString().replace('?show_deleted=true','')
+    if (url.endsWith('/')){
+         apiUrl = url + 'delete_comment'
+    }else {
+         apiUrl = url + '/delete_comment'
+
+    }
+
+    console.log(apiUrl)
+    var logBar = document.getElementById('log')
+    $.ajax({
+    url: apiUrl,
+    type:"POST",
+    dataType: 'json',
+        data:{'csrfmiddlewaretoken':'{{ csrf_token }}','comment':id},
+    success:function (response) {
+        logBar.innerHTML += response.message.toString() + "<br>"
+        $('#'+'dataRow'+id).fadeOut('slow')
+    },
+    error: function(response){
+        logBar.innerHTML += response.message.toString() + "<br>"
+    }
+    })
+
+    logBar.scrollTop = logBar.scrollHeight
+    {#logBar#}
+}
+</script>
+{% endblock %}

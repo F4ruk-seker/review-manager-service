@@ -7,10 +7,10 @@ from .comment_tag_serializers import CommentTagSerializer
 
 class CommentSerializer(serializers.ModelSerializer):
 
-
     class Meta:
         model = CommentModel
         fields = '__all__'
+
 
 
 class CustomizedCommentBranchSerializer(CommentSerializer):

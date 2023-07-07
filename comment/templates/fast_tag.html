@@ -99,6 +99,13 @@ user_log: [],
                     }
                 }
                 this.tags = temp_list;
+                /*
+                this.tags = data.map(result => ({if (result) => {
+                  id: result.id,
+                  name: result.tag.name,
+                  color: '' // Etiketlere göre uygun renkleri tanımlayın
+                }}));
+  */
             }catch (error){
                 this.tags = []
                 console.log(error)
