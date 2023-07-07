@@ -9,7 +9,7 @@
         <input type="text" v-model="comment.red" value="None" class="d-none">
         <input type="text" v-model="comment.result" id="result" class="d-none">
 
-        <div class="jumbotron mx-md-5 px-md-5 mt-5">
+        <div class="jumbotron ">
           <h3 class="display-4 text-dark">
             row = {{ row }} id = {{ comment.id }} : Değer
             <span class="text-info">{{ comment.tag ? comment.tag.name : 'Tanımsız' }}</span>
@@ -19,9 +19,9 @@
           </p>
           <hr class="my-4">
 
-          <div class="btn-group btn-group-toggle d-block my-3" comment-toggle="buttons">
+          <div class="btn-group btn-group-toggle d-block my-3" comment-toggle="buttons" id="tag_select_list">
             <label v-for="tag in tags" :key="tag.id" :class="['btn', tag.color]">
-              <input type="radio" v-model="tag.id" :value="tag.id" name="tag" >
+              <input type="radio" v-model="tag.id" :value="tag.id" :id="'tag_' + tag.id" name="tag" >
                 {{ tag.name }}
             </label>
           </div>
@@ -45,6 +45,17 @@
       <div class="text-secondary mt-2 text-center">
         <strong>Listede gezinmek için Yukarı aşağı yön tuşlarını kullanınız <span class="text-danger">/\</span>  <span class="text-success">\/</span></strong>
       </div>
+    <div class="card mt-1" v-if="user_log.length > 0">
+        <div class="card-header">
+           L0gic: w/temp |
+        </div>
+      <div  class="card-body text-secondary mt-2 text-left pt-0" style="max-height: 20vh;overflow-y: auto">
+        <ul class="list-unstyled">
+            <li v-for="log in user_log" >{{ log }}</li>
+        </ul>
+      </div>
+    </div>
+
 {% endverbatim %}
 {% endblock %}
 
@@ -54,7 +65,7 @@
       el: '#main',
       data: {
       selectedTagId: null,
-
+user_log: [],
       token: '{{ csrf_token }}',
         comment: {
           id: '',
@@ -122,7 +133,8 @@
   }
 },
         async saveComment() {
-            console.log(this.comment)
+
+
           try {
             const response = await fetch('http://127.0.0.1:8000/api/comment/' + this.comment.id + '/', {
               method: 'PUT',
@@ -132,12 +144,14 @@
               },
               body: JSON.stringify({
                   text:this.comment.comment,
-                  id:this.comment.id
+                  id:this.comment.id,
+                  tag:get_selected_tag_id()
               })
             });
 
             const data = await response.json();
             console.log('Yorum kaydedildi:', data);
+            this.user_log.push(`Yorum kaydedildi: id:${data.id} > tag-id:${data.tag}`)
 
             // Yorum kaydedildikten sonra verileri güncelleyin veya yeni veri isteği yapın
             this.fetchData();
@@ -166,6 +180,19 @@ goToNextPage() {
 },
       }
     });
+
+    function get_selected_tag_id() {
+        var tag_select_list = document.getElementById('tag_select_list');
+        var TagInputs = tag_select_list.querySelectorAll('input[type="radio"]');
+        var selected_tag_id = null;
+        for (let i = 0; i <TagInputs.length; i++) {
+            if (TagInputs[i].checked) {
+                selected_tag_id = TagInputs[i].value;
+                break;
+            }
+        }
+        return selected_tag_id
+    }
   </script>
 
 {% endblock %}
