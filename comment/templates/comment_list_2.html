@@ -173,13 +173,16 @@
                         if (this.tags[tagi].id === this.comment_list[comi].tag.id){
                             counter ++
                         }
-                    } else {
-                        un_tag_caount ++
                     }
                 }
                 var obj = this.tags[tagi]
                 obj.count = counter
                 temp_list.push(obj)
+            }
+            for (let comi = 0; comi < this.comment_list.length; comi++) {
+                if (this.comment_list[comi].tag === null) {
+                    un_tag_caount++
+                }
             }
             this.un_tag_count = un_tag_caount
             this.tags = temp_list
