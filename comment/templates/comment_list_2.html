@@ -12,10 +12,10 @@
 
     <div class="d-flex grid">
 
-        <button type="button" onclick="document.location.search = ''" class="btn btn-sm btn-outline-info me-1">Tümü <span style="color:red">({{ comment_list.length }})</span></button>
-            <button v-for="tag in tags" type="button" :class="'btn btn-sm btn-outline-' + tag.color.replace('btn-', '') + ' me-1'">{{ tag.name }} <span style="color:red">({{ tag.count }})</span></button>
+        <button type="button" @click="filter_trig(true)" class="btn btn-sm btn-outline-info me-1">Tümü <span style="color:red">({{ comment_list.length }})</span></button>
+            <button v-for="tag in tags" type="button" :class="'btn btn-sm btn-outline-' + tag.color.replace('btn-', '') + ' me-1'" :key="tag.id" @click="filter_trig(tag.id)">{{ tag.name }} <span style="color:red">({{ tag.count }})</span></button>
             <span style="width: 10px"></span>
-            <button type="button" class="btn btn-sm btn-outline-dark me-1">Tanımsız <span style="color:red">({{ un_tag_count }})</span></button>
+            <button type="button" class="btn btn-sm btn-outline-dark me-1" @click="filter_trig(null)">Tanımsız <span style="color:red">({{ un_tag_count }})</span></button>
 
     </div>
     <hr class="text-dark">
@@ -26,7 +26,9 @@
                 <tr class="pe-5">
                     <th scope="col" style="width: 200px">#
                         <input type="checkbox" @change="select_dselect_all_comment()" id="many_select_trigger_obj">
-                        <label for="many_select_trigger_obj" id="comment_selected_message">Tümünü Seç</label>
+                        <label for="many_select_trigger_obj" id="comment_selected_message">Tümünü Seç
+                            <span v-if="select_comment_count > 0">({{ select_comment_count }})</span>
+                        </label>
                     </th>
                     <th scope="col" style="text-align: center;padding-right: 20px">text</th>
                     <th scope="col" style="text-align: left; width: 100px;">tag</th>
@@ -37,7 +39,7 @@
         <div style="overflow-y: auto;max-height: 50vh">
             <table class="table table-sm table-light table-striped border mb-0 ">
                 <tbody id="comment_area">
-                    <tr v-for="(comment, index) in comment_list">
+                    <tr v-for="(comment, index) in filteredComments" :key="comment.id" >
                         <th scope="row" :id="'comment_temp_' + comment.id">{{ index + 1 }}
                             <input type="checkbox" class="comment_checkbox" :id="'comment_checkbox_' + comment.id ">
                         </th>
@@ -89,16 +91,18 @@
         data:{
             comment_list:[],
             tags:[],
-            un_tag_count: 0
+            un_tag_count: 0,
+            filter_tag_id: null,
+            select_comment_count: 0,
         },
         methods: {
+
         async fetch_load_comment_list_from_api(){
             try {
                 var url = 'http://127.0.0.1:8000/api/comment/'
                 const response = await fetch(url);
                 const data = await response.json();
                 this.comment_list = data
-                console.log(data)
             }catch (error){
                 this.tags = []
                 console.log(error)
@@ -130,10 +134,17 @@
             }
         },
         change_checkbox_status(id){
-            document.getElementById('comment_checkbox_' + id).checked =! document.getElementById('comment_checkbox_' + id).checked
+            this.set_checkbox_status(id, !document.getElementById('comment_checkbox_' + id).checked)
         },
         set_checkbox_status(id, status){
-            document.getElementById('comment_checkbox_' + id).checked = status
+            var _ = document.getElementById('comment_checkbox_' + id)
+            if (_){
+                if (_.checked !== status){
+                    status ? this.select_comment_count++ : this.select_comment_count--;
+                }
+                _.checked = status
+            }
+
         },
         select_all_this_branch_comments(branch){
             for (let i = 0; i < this.comment_list.length; i++) {
@@ -171,9 +182,33 @@
             await this.fetchTagData()
             await this.get_stats_with_tag()
         },
+        filter_trig(tag_id){
+            this.filter_tag_id = tag_id
+        }
     },
         mounted(){
             this.collect_data()
+        },
+        computed:{
+filteredComments() {
+  this.select_comment_count = 0;
+
+    if (this.filter_tag_id === true)  {
+      return this.comment_list
+    }
+  else if (this.filter_tag_id !== null) {
+    return this.comment_list.filter(comment => {
+      if (comment.tag) {
+        return comment.tag.id === this.filter_tag_id;
+      }
+      return false;
+    });
+  } else if (this.filter_tag_id === null) {
+    return this.comment_list.filter(comment => {
+      return comment.tag === null;
+    });
+  }
+}
         }
     })
 </script>
