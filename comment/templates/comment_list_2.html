@@ -68,11 +68,17 @@
         <p class="m-0 mt-1"> this table has <span class="text-info fw-semibold"> {{ comment_list.length }} </span> comment </p>
     </footer>
 
-    <section v-show="comment_list.length == 0" class="alert alert-info mb-2">Here Empty</section>
+    <section v-if="on_load" class="spinner-border mb-2" role="status">
+        <span class="sr-only">Loading...</span>
+    </section>
+
+    <section v-else v-show="comment_list.length == 0" class="alert alert-warning mb-2">
+        <span>Here Empty</span>
+    </section>
 </div>
 <hr>
 
-<div class="card p-3">
+<div class="card p-3" v-if="comment_list.length > 0">
     <div class="d-flex">
         <button type="button" class="btn btn-sm btn-outline-info me-1">Ekle </button>
         <a class="btn btn-sm btn-outline-info me-1 d-flex" href="{ request.path }output/">Download <i class="fa-solid fa-download my-auto ms-1"></i></a>
@@ -94,6 +100,7 @@
             un_tag_count: 0,
             filter_tag_id: null,
             select_comment_count: 0,
+            on_load: true,
         },
         methods: {
 
@@ -181,6 +188,7 @@
             await this.fetch_load_comment_list_from_api()
             await this.fetchTagData()
             await this.get_stats_with_tag()
+            this.on_load = false
         },
         filter_trigger(tag_id){
             this.filter_tag_id = tag_id
@@ -203,7 +211,7 @@ filteredComments() {
       }
       return false;
     });
-  } else if (this.filter_tag_id === null) {
+  } else {
     return this.comment_list.filter(comment => {
       return comment.tag === null;
     });

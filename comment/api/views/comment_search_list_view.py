@@ -16,4 +16,3 @@ class CommentSearchListView(ListAPIView):
     search_fields = ('text', 'id', 'branch_from', 'ai_tag', 'tag')
 
 
-
