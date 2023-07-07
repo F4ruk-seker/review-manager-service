@@ -12,10 +12,10 @@
 
     <div class="d-flex grid">
 
-        <button type="button" @click="filter_trig(true)" class="btn btn-sm btn-outline-info me-1">Tümü <span style="color:red">({{ comment_list.length }})</span></button>
-            <button v-for="tag in tags" type="button" :class="'btn btn-sm btn-outline-' + tag.color.replace('btn-', '') + ' me-1'" :key="tag.id" @click="filter_trig(tag.id)">{{ tag.name }} <span style="color:red">({{ tag.count }})</span></button>
+        <button type="button" @click="filter_trigger(true)" class="btn btn-sm btn-outline-info me-1">Tümü <span style="color:red">({{ comment_list.length }})</span></button>
+            <button v-for="tag in tags" type="button" :class="'btn btn-sm btn-outline-' + tag.color.replace('btn-', '') + ' me-1'" :key="tag.id" @click="filter_trigger(tag.id)">{{ tag.name }} <span style="color:red">({{ tag.count }})</span></button>
             <span style="width: 10px"></span>
-            <button type="button" class="btn btn-sm btn-outline-dark me-1" @click="filter_trig(null)">Tanımsız <span style="color:red">({{ un_tag_count }})</span></button>
+            <button type="button" class="btn btn-sm btn-outline-dark me-1" @click="filter_trigger(null)">Tanımsız <span style="color:red">({{ un_tag_count }})</span></button>
 
     </div>
     <hr class="text-dark">
@@ -182,7 +182,7 @@
             await this.fetchTagData()
             await this.get_stats_with_tag()
         },
-        filter_trig(tag_id){
+        filter_trigger(tag_id){
             this.filter_tag_id = tag_id
         }
     },
