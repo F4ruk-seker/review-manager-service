@@ -18,8 +18,6 @@ class CommentUpdateDestroyRetrieveView(RetrieveUpdateDestroyAPIView):
         return self.retrieve(request, *args, **kwargs)
 
     def put(self, request, *args, **kwargs):
-        print(args)
-        print(kwargs.items())
         return self.update(request, *args, **kwargs)
 
     def delete(self, request, *args, **kwargs):

@@ -111,7 +111,7 @@ user_log: [],
                 console.log(error)
             }
         },
-        async fetchData(url = 'http://127.0.0.1:8000/api/ai/tool/pool/476cc922-f8c6-47ec-99df-653e136d14eb/comment/tag/fast/') {
+        async fetchData(url = document.location.href.replace('ai', 'api/ai')) {
   try {
     const response = await fetch(url);
     const data = await response.json();
