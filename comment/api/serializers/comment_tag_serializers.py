@@ -5,5 +5,6 @@ from comment.models import CommentTag
 class CommentTagSerializer(serializers.ModelSerializer):
     class Meta:
         model = CommentTag
-        fields = ('id', 'name')
+        # fields = ('id', 'name')
+        fields = '__all__'
 

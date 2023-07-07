@@ -17,5 +17,8 @@ urlpatterns = [
     # path('tool/pool/comment/')
     path('tool/pool/', views.PoolListSearchView.as_view()),
     path('tool/pool/<pk>/', views.PoolCommentList.as_view()),
-    path('tool/pool/<pool_id>/comment/<comment_id>/', views.PoolCommentAddRemove.as_view())
+    path('tool/pool/<pool_id>/comment/tag/fast/', views.FastTag.as_view()),
+    path('tool/pool/<pool_id>/comment/<comment_id>/', views.PoolCommentAddRemove.as_view()),
+    path('tool/pool/<pool_id>/comment/<comment_id>/tag/', views.PoolCommentAddRemove.as_view()),
 ]
+

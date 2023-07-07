@@ -1,2 +1,2 @@
 from .pool_serializer import PoolSerializer, PoolCommentSerializer
-
+from .fast_tag_serializer import CommentTagSerializer

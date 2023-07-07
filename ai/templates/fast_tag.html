@@ -1,0 +1,171 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{#            @change="handleTagSelection(tag.id)#}
+
+{% verbatim %}
+  <form @submit.prevent="saveComment">
+        <input type="text" v-model="comment.id" class="d-none">
+        <input type="text" v-model="comment.red" value="None" class="d-none">
+        <input type="text" v-model="comment.result" id="result" class="d-none">
+
+        <div class="jumbotron mx-md-5 px-md-5 mt-5">
+          <h3 class="display-4 text-dark">
+            row = {{ row }} id = {{ comment.id }} : Değer
+            <span class="text-info">{{ comment.tag ? comment.tag.name : 'Tanımsız' }}</span>
+          </h3>
+          <p class="lead">
+            <textarea v-model="comment.comment" class="bg-light text-dark fw-semibold rounded border-info text-light p-1 w-100" rows="6"></textarea>
+          </p>
+          <hr class="my-4">
+
+          <div class="btn-group btn-group-toggle d-block my-3" comment-toggle="buttons">
+            <label v-for="tag in tags" :key="tag.id" :class="['btn', tag.color]">
+              <input type="radio" v-model="tag.id" :value="tag.id" name="tag" >
+                {{ tag.name }}
+            </label>
+          </div>
+          <input type="checkbox" @change="toggleDeleteStatus" class="btn-check" id="comment_delete_status" autocomplete="off">
+          <label class="btn btn-outline-danger btn-lg" id="comment_delete_status_label">Sil</label>
+
+          <button type="submit" class="btn btn-success btn-lg mx-5" role="button" id="save">Kaydet</button>
+        </div>
+        <br>
+
+        <div class="m-auto text-center">
+          <button type="button" class="btn btn-success btn-lg mx-5" @click="goToPreviousPage" id="ap">&lt;</button>
+          <button type="button" class="btn btn-success btn-lg mx-5" @click="goToNextPage" id="np">&gt;</button>
+        </div>
+      </form>
+
+      <ul class="text-dark list-group d-flex flex-wrap" style="list-style: none; display: flex; flex-wrap: wrap;">
+        <li v-for="reviewStat in reviewStats" :key="reviewStat.id" class="me-1" :class="">{{ reviewStat }}</li>
+      </ul>
+
+      <div class="text-secondary mt-2 text-center">
+        <strong>Listede gezinmek için Yukarı aşağı yön tuşlarını kullanınız <span class="text-danger">/\</span>  <span class="text-success">\/</span></strong>
+      </div>
+{% endverbatim %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+    new Vue({
+      el: '#main',
+      data: {
+      selectedTagId: null,
+
+      token: '{{ csrf_token }}',
+        comment: {
+          id: '',
+          tag: null,
+          comment: '',
+        },
+        tags: [],
+        reviewStats: [],
+        row: 0
+      },
+      mounted() {
+        this.fetchData();
+        this.fetchTagData();
+      },
+      methods: {
+          handleTagSelection(tagId) {
+      this.selectedTagId = tagId;
+      // Seçilen tag'ın ID'siyle yapmak istediğiniz işlemleri burada gerçekleştirebilirsiniz
+    },
+        async fetchTagData(){
+            try {
+                var url = 'http://127.0.0.1:8000/api/comment/tag/'
+                const response = await fetch(url);
+                const data = await response.json();
+                var temp_list = []
+                for (let i = 0; i < data.length; i++) {
+                    if (data[i].id){
+                        var d = data[i]
+                        d.color = 'btn-' + data[i].color
+                        temp_list.push(d)
+                    }
+                }
+                this.tags = temp_list;
+                /*
+                this.tags = data.map(result => ({if (result) => {
+                  id: result.id,
+                  name: result.tag.name,
+                  color: '' // Etiketlere göre uygun renkleri tanımlayın
+                }}));
+  */
+            }catch (error){
+                this.tags = []
+                console.log(error)
+            }
+        },
+        async fetchData(url = 'http://127.0.0.1:8000/api/ai/tool/pool/476cc922-f8c6-47ec-99df-653e136d14eb/comment/tag/fast/') {
+  try {
+    const response = await fetch(url);
+    const data = await response.json();
+    if (data.results.length > 0) {
+      this.comment = {
+        id: data.results[0].id,
+        comment: data.results[0].text,
+      };
+    }
+
+    this.reviewStats = []; // API'den alınan verilere göre güncelleyin
+    this.pagination = {
+      count: data.count,
+      next: data.next,
+      previous: data.previous
+    };
+  } catch (error) {
+    console.error('Veri alınamadı:', error);
+  }
+},
+        async saveComment() {
+            console.log(this.comment)
+          try {
+            const response = await fetch('http://127.0.0.1:8000/api/comment/' + this.comment.id + '/', {
+              method: 'PUT',
+              headers: {
+                'Content-Type': 'application/json',
+                  'X-CSRFToken': this.token
+              },
+              body: JSON.stringify({
+                  text:this.comment.comment,
+                  id:this.comment.id
+              })
+            });
+
+            const data = await response.json();
+            console.log('Yorum kaydedildi:', data);
+
+            // Yorum kaydedildikten sonra verileri güncelleyin veya yeni veri isteği yapın
+            this.fetchData();
+          } catch (error) {
+            console.error('Yorum kaydedilemedi:', error);
+          }
+        },
+        toggleDeleteStatus() {
+          this.comment.delete = !this.comment.delete;
+        },
+goToPreviousPage() {
+  const previousPageUrl = this.pagination.previous;
+  if (previousPageUrl) {
+    this.fetchData(previousPageUrl);
+  } else {
+    alert('İlk sayfadasınız');
+  }
+},
+goToNextPage() {
+  const nextPageUrl = this.pagination.next;
+  if (nextPageUrl) {
+    this.fetchData(nextPageUrl);
+  } else {
+    alert('Son sayfadasınız');
+  }
+},
+      }
+    });
+  </script>
+
+{% endblock %}

@@ -20,6 +20,7 @@ class CommentModel(models.Model):
 class CommentTag(models.Model):
     name = models.TextField()
     explanation = models.TextField()
+    color = models.TextField(default=None, null=True)
 
     @classmethod
     def load_built_in_tags(cls) -> None:

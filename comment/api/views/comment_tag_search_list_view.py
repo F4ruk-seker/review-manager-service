@@ -12,6 +12,3 @@ class CommentTagListView(ListAPIView):
     filter_backends = (DjangoFilterBackend, SearchFilter)
     filter_fields = ('text', 'id', 'branch_from', 'ai_tag', 'tag')
     search_fields = ('text', 'id', 'branch_from', 'ai_tag', 'tag')
-
-
-

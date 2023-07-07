@@ -1,5 +1,8 @@
 from .pool_output import PoolOutput
 from .pool_list_view import PoolView
+from .pool_fast_tag_view import PoolFastTagView
+
+
 from comment.api.serializers import CustomizedCommentBranchSerializer
 
 from django.views.generic import ListView
