@@ -21,6 +21,12 @@
     <hr class="text-dark">
     </header>
     <section v-show="comment_list.length > 0" >
+    <div style="height: 10px">
+        <div v-if="api_response.status" class="progress rounded-0" style="height: 10px">
+            <div  class="progress-bar progress-bar-striped bg-danger progress-bar-animated" role="progressbar" :aria-valuenow="api_response.progress" aria-valuemin="0" aria-valuemax="100" :style="'width:' + api_response.progress + '%'"></div>
+        </div>
+    </div>
+
         <table class="table table-sm table-light table-striped border pb-0 mb-0">
             <thead>
                 <tr class="pe-5">
@@ -49,8 +55,16 @@
                             </button>
                         </td>
                         <td  @click="change_checkbox_status(comment.id)" :key="comment.id">{{ comment.text }}</td>
-                    <td v-if="comment.tag" style="width: 100px;">{{ comment.tag.name }}</td>
-                    <td v-else="comment.tag" class="text-secondary" style="width: 100px;">Tanımsız</td>
+
+                    <td style="width: 100px;">
+                        <select class="form-control form-control-sm input-sm" :id="'comment_tag_' + comment.id" @change="change_comment_tag(comment.id)">
+                            <option v-if="comment.tag === null" value="-1" selected>Tanımsız</option>
+                            <option v-else value="-1" >Tanımsız</option>
+                            <option v-for="tag in tags" :value="tag.id" :selected="comment.tag && comment.tag.id === tag.id">{{ tag.name }}</option>
+                        </select>
+                    </td>
+
+
                         <td class="branch-select-row link-secondary fw-semibold" style="width: 100px;"
                             value="{ comment.branch_from.id }"
                             @click="select_all_this_branch_comments(comment.branch_from.id)"
@@ -87,6 +101,20 @@
     </div>
 </div>
 
+    <div class="card mt-1" v-if="user_log.length > 0">
+        <div class="card-header">
+           L0gic: w/temp |
+        </div>
+      <div  class="card-body text-secondary mt-2 text-left pt-0" style="max-height: 20vh;overflow-y: auto">
+        <ul class="list-unstyled">
+            <li v-for="log in user_log" >
+                <p v-if="log">logic: {{ log.message }} kim? :<span class="text-info"> {{ user }}</span></p>
+                <p v-if="log.type=='error'">logic: {{ log.message }} kim? :<span class="text-info"> {{ user }}</span><br><code>{{ log.error }}</code></p>
+            </li>
+        </ul>
+      </div>
+    </div>
+
 {% endverbatim %}
 {% endblock %}
 
@@ -101,9 +129,74 @@
             filter_tag_id: null,
             select_comment_count: 0,
             on_load: true,
+            api_response: {
+                status: false,
+                progress: 0
+            },
+            token: '{{ csrf_token }}',
+            user_log: [],
+            user: '{{ request.user }}'
         },
         methods: {
+        async change_comment_tag(comment_id){
+            this.api_response.status = true
+            this.api_response.progress = 30
 
+            var comment_set_tag_bar = document.getElementById('comment_tag_' + comment_id)
+
+            for (let i = 0; i <this.comment_list.length; i++) {
+                if (this.comment_list[i].id === comment_id){
+                      try {
+                        const response = await fetch('http://127.0.0.1:8000/api/comment/' + this.comment_list[i].id + '/', {
+                          method: 'PUT',
+                          headers: {
+                            'Content-Type': 'application/json',
+                              'X-CSRFToken': this.token
+                          },
+                          body: JSON.stringify({
+                              text:this.comment_list[i].id,
+                              id:this.comment_list[i].id,
+                              tag:comment_set_tag_bar.value
+                          })
+                        });
+                            this.api_response.progress = 40
+
+                            const data = await response.json();
+                            this.api_response.progress = 65
+
+                            console.log('Yorum kaydedildi:', data);
+                            this.user_log.push(`{#Yorum kaydedildi: id:${data.id} > tag-id:${data.tag} <span style="color:cyan">kim?:${this.user} </span>#}`)
+                            this.user_log.push({
+                                message: `Yorum kaydedildi: id:${data.id} > tag-id:${data.tag}`,
+                                type:'ok',
+                            })
+
+                            this.api_response.progress = 70
+
+                            // Yorum kaydedildikten sonra verileri güncelleyin veya yeni veri isteği yapın
+                            await this.fetch_load_comment_list_from_api();
+                            this.api_response.progress = 90
+
+                            await this.get_stats_with_tag()
+                            this.api_response.progress = 100
+
+                            this.api_response.status = false
+                            this.api_response.progress = 0
+
+                              } catch (error) {
+                                this.user_log.push({
+                                    message: `Yorum kaydedilemedi:: id:${data.id} > tag-id:${data.tag}`,
+                                    type:'error',
+                                    error:error
+                                })
+                console.error('Yorum kaydedilemedi:', error);
+              }
+                    break;
+                }
+            }
+
+
+        },
         async fetch_load_comment_list_from_api(){
             try {
                 var url = 'http://127.0.0.1:8000/api/comment/'
@@ -192,6 +285,7 @@
             await this.fetchTagData()
             await this.get_stats_with_tag()
             this.on_load = false
+            this.filter_tag_id = true
         },
         filter_trigger(tag_id){
             this.filter_tag_id = tag_id
