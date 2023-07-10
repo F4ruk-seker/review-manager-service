@@ -36,6 +36,7 @@
                             <span v-if="select_comment_count > 0">({{ select_comment_count }})</span>
                         </label>
                     </th>
+                    <th scope="col" style="text-align: center;padding-right: 20px"></th>
                     <th scope="col" style="text-align: center;padding-right: 20px">text</th>
                     <th scope="col" style="text-align: left; width: 100px;">tag</th>
                     <th scope="col" style="text-align: left; width: 100px;">branch <i class="fa-solid fa-link"></i></th>
@@ -46,7 +47,7 @@
             <table class="table table-sm table-light table-striped border mb-0 ">
                 <tbody id="comment_area">
                     <tr v-for="(comment, index) in filteredComments" :key="comment.id" >
-                        <th scope="row" :id="'comment_temp_' + comment.id">{{ index + 1 }}
+                        <th scope="row" :id="'comment_temp_' + comment.id" > {{ index + 1 }}
                             <input type="checkbox" class="comment_checkbox" :id="'comment_checkbox_' + comment.id ">
                         </th>
                         <td o="selected_display()">
@@ -54,14 +55,19 @@
                                 <i class="fa-solid fa-circle-minus"></i>
                             </button>
                         </td>
-                        <td  @click="change_checkbox_status(comment.id)" :key="comment.id">{{ comment.text }}</td>
+                        <td  @click="change_checkbox_status(comment.id)" :key="comment.id">{{ comment.text.length }} > {{ comment.text }}</td>
 
-                    <td style="width: 100px;">
-                        <select class="form-control form-control-sm input-sm" :id="'comment_tag_' + comment.id" @change="change_comment_tag(comment.id)">
-                            <option v-if="comment.tag === null" value="-1" selected>Tanımsız</option>
+                    <td style="width: 200px;">
+                        <select v-show="!on_load" class="form-control form-control-sm input-sm" :id="'comment_tag_' + comment.id" @change="change_comment_tag(comment.id)">
+                            <option v-if="comment.tag === null" value="-1" selected style="color: red">Tanımsız</option>
                             <option v-else value="-1" >Tanımsız</option>
-                            <option v-for="tag in tags" :value="tag.id" :selected="comment.tag && comment.tag.id === tag.id">{{ tag.name }}</option>
+                            <option v-for="tag in tags" :value="tag.id" :selected="comment.tag && comment.tag.id === tag.id" :style="comment.tag && comment.tag.id === tag.id ? 'color:red' : ''">{{ tag.name }}</option>
                         </select>
+                        <div v-show="on_load" class="text-center">
+                          <div class="spinner-grow spinner-grow-sm" role="status">
+                              <span class="sr-only">Loading...</span>
+                            </div>
+                        </div>
                     </td>
 
 
@@ -100,20 +106,21 @@
         <button type="button" class="btn btn-sm btn-outline-danger me-1 px-4" onclick="many_select_delete()">Sil</button>
     </div>
 </div>
+<hr v-show="user_log.length > 0">
 
-    <div class="card mt-1" v-if="user_log.length > 0">
-        <div class="card-header">
-           L0gic: w/temp |
-        </div>
-      <div  class="card-body text-secondary mt-2 text-left pt-0" style="max-height: 20vh;overflow-y: auto">
-        <ul class="list-unstyled">
-            <li v-for="log in user_log" >
-                <p v-if="log">logic: {{ log.message }} kim? :<span class="text-info"> {{ user }}</span></p>
-                <p v-if="log.type=='error'">logic: {{ log.message }} kim? :<span class="text-info"> {{ user }}</span><br><code>{{ log.error }}</code></p>
-            </li>
-        </ul>
-      </div>
+<div class="card mt-1" v-if="user_log.length > 0">
+    <div class="card-header">
+       L0gic: w/temp |
     </div>
+  <div  class="card-body text-secondary mt-2 text-left pt-0" style="max-height: 20vh;overflow-y: auto">
+    <ul class="list-unstyled">
+        <li v-for="log in user_log" >
+            <p class="mb-0" v-if="log">logic: {{ log.message }} kim? :<span class="text-info"> {{ user }}</span></p>
+            <p class="mb-0" v-if="log.type=='error'">logic: {{ log.message }} kim? :<span class="text-info"> {{ user }}</span><br><code>{{ log.error }}</code></p>
+        </li>
+    </ul>
+  </div>
+</div>
 
 {% endverbatim %}
 {% endblock %}

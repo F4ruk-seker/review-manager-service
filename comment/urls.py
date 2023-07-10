@@ -6,6 +6,6 @@ app_name = "comment"
 
 urlpatterns = [
     path('', CommentSearchListView.as_view(), name="comment_list"),
-    # path('fast/', include('comment.api.urls', namespace="comment_fast")),
+    path('fast/', FastTagView.as_view(), name="comment_fast"),
 ]
 

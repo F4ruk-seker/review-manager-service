@@ -8,6 +8,7 @@ class CommentModel(models.Model):
                                help_text="tagged from ai service", related_name="ai_tag")
     tag = models.ForeignKey('CommentTag', on_delete=models.SET_NULL, null=True, blank=True,related_name="human_tag")
     branch_from = models.ForeignKey('branch.BranchModel', on_delete=models.SET_NULL, null=True, blank=True)
+    create = models.DateTimeField(auto_created=True, default=None, null=True)
 
     def get_as_json(self) -> dict:
         return {

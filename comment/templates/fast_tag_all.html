@@ -65,7 +65,7 @@
       el: '#main',
       data: {
       selectedTagId: null,
-user_log: [],
+      user_log: [],
       token: '{{ csrf_token }}',
         comment: {
           id: '',
@@ -111,7 +111,7 @@ user_log: [],
                 console.log(error)
             }
         },
-        async fetchData(url = document.location.href.replace('ai', 'api/ai')) {
+async fetchData(url = document.location.origin + '/api/comment/' ) {
   try {
     const response = await fetch(url);
     const data = await response.json();
