@@ -17,7 +17,7 @@ class BranchSerializer(serializers.ModelSerializer):
     metric_list = serializers.SerializerMethodField()
 
     @staticmethod
-    def get_metric_list(obj) -> list:
+    def get_metric_list(obj) :
         metric_list: list = []
         for metric in obj.get_metrics():
             metric_list.append(

@@ -9,7 +9,7 @@ class PoolFastTagView(TemplateView):
     template_name = 'fast_tag.html'
 
     @staticmethod
-    def get_tags() -> list:
+    def get_tags() :
         comments: list[CommentTag] = CommentTag.objects.all()
         return [CommentTagSerializer(comment).data for comment in comments]
 

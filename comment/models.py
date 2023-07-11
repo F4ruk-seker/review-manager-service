@@ -10,7 +10,7 @@ class CommentModel(models.Model):
     branch_from = models.ForeignKey('branch.BranchModel', on_delete=models.SET_NULL, null=True, blank=True)
     create = models.DateTimeField(auto_created=True, default=None, null=True)
 
-    def get_as_json(self) -> dict:
+    def get_as_json(self) :
         return {
             'text': self.text,
             'ai_tag': self.ai_tag.name if self.ai_tag else None,
@@ -24,7 +24,7 @@ class CommentTag(models.Model):
     color = models.TextField(default=None, null=True)
 
     @classmethod
-    def load_built_in_tags(cls) -> None:
+    def load_built_in_tags(cls):
         tags = [
             {"name": "YETKİNLİK", "explanation": "Açıklama yok"},
             {"name": "İÇTEN", "explanation": "Açıklama yok"},

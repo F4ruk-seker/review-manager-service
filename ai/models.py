@@ -4,26 +4,20 @@ import uuid
 
 
 class AIManager(models.Model):
-    id = models.UUIDField(
-        primary_key=True,
-        default=uuid.uuid4,
-        editable=False)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.TextField()
     pool = models.ForeignKey('ai.CommentPool', editable=True, on_delete=models.CASCADE, null=True)
     # trained_structure = models.FileField(upload_to='D:\.trained_data',  editable=True, default=None, null=True, )
 
 
 class CommentPool(models.Model):
-    id = models.UUIDField(
-        primary_key=True,
-        default=uuid.uuid4,
-        editable=False)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.TextField()
     comments = models.ManyToManyField('comment.CommentModel')
     is_trained = models.BooleanField(default=False)
     last_update = models.DateTimeField(auto_now=True, auto_created=True)
 
-    def get_stats(self) -> dict:
+    def get_stats(self) :
         tag_list = CommentTag.objects.all().order_by('name')
         tag_list_dict: dict = {}
 

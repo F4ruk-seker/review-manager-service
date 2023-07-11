@@ -61,7 +61,7 @@ class BranchMetric(models.Model):
             {"name": "excitement", "result": round((self.excitement_count / total) * 100, 2)},  # heyecan
         ]
 
-    def get_counter_counts(self) -> dict:
+    def get_counter_counts(self) :
         counter_counts: dict = {}
         for k, v in self.__dict__.items():
             if k.endswith("count"):
