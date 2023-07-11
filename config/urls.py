@@ -23,7 +23,7 @@ from Base.views import IndexPage
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', IndexPage.as_view(), name='home'),
-    path('login/', LoginView.as_view()),
+    path('login/', LoginView.as_view(), name='login_page'),
     path('api/', include('api.urls', namespace="api")),
     path('branch/', include('branch.urls')),
     path('comment/', include('comment.urls')),
