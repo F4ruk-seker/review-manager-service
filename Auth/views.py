@@ -19,6 +19,7 @@ class LoginView(FormView):
                 if token := AuthTokenModel.objects.filter(token=token).first():
                     if token.is_live():
                         login(request, token.user)
+                        return redirect('home')
 
         return super().get(request, *args, **kwargs)
     
