@@ -30,6 +30,8 @@
         <option value="$MODULE_DIR$/static/jquery" />
         <option value="$MODULE_DIR$/ai/templates" />
         <option value="$MODULE_DIR$/comment/templates" />
+        <option value="$MODULE_DIR$/Auth/templates" />
+        <option value="$MODULE_DIR$/Base/templates" />
       </list>
     </option>
   </component>

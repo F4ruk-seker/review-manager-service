@@ -1,0 +1,14 @@
+ {% extends 'base.html' %}
+
+ {% block content %}
+     <div class="alert alert-warning">Temp > </div>
+    <div class="list-group">
+        <a href="/comment/fast/" class="list-group-item list-group-item-action active" aria-current="true">
+        > Hızlı Taglama
+        </a>
+        <a href="/comment" class="list-group-item list-group-item-action">Yorumları gör</a>
+        <a href="/ai/tool/pool/" class="list-group-item list-group-item-action">Havuzlar</a>
+    </div>
+    <hr>
+     <div class="link-info fw-semibold"> / user | {{ request.user }}</div>
+ {% endblock %}

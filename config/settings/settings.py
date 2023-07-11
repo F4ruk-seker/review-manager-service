@@ -33,9 +33,12 @@ INSTALLED_APPS = [
     'branch',
     'comment',
     'ai',
+    'Auth',
+    'Base',
 ]+[
     'rest_framework',
 ]
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -116,4 +119,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # temp
 DATA_UPLOAD_MAX_NUMBER_FIELDS = None
+
+LOGIN_URL = '/login'
+LOGIN_REDIRECT_URL = ''
 

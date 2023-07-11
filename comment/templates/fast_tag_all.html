@@ -26,7 +26,7 @@
             </label>
           </div>
           <input type="checkbox" @change="toggleDeleteStatus" class="btn-check" id="comment_delete_status" autocomplete="off">
-          <label class="btn btn-outline-danger btn-lg" id="comment_delete_status_label">Sil</label>
+          <label class="btn btn-outline-danger btn-lg" id="comment_delete_status_label" type="button" @click="deleteComment()">Sil</label>
 
           <button type="submit" class="btn btn-success btn-lg mx-5" role="button" id="save">Kaydet</button>
         </div>
@@ -39,7 +39,9 @@
       </form>
 
       <ul class="text-dark list-group d-flex flex-wrap" style="list-style: none; display: flex; flex-wrap: wrap;">
-        <li v-for="reviewStat in reviewStats" :key="reviewStat.id" class="me-1" :class="">{{ reviewStat }}</li>
+        <li v-for="reviewStat in reviewStats" :key="reviewStat.id" class="me-1" :class="">
+            {{ reviewStat.name }} {{ reviewStat.count }}
+        </li>
       </ul>
 
       <div class="text-secondary mt-2 text-center">
@@ -74,7 +76,7 @@
         },
         tags: [],
         reviewStats: [],
-        row: 0
+        row: 0,
       },
       mounted() {
         this.fetchData();
@@ -87,7 +89,7 @@
     },
         async fetchTagData(){
             try {
-                var url = 'http://127.0.0.1:8000/api/comment/tag/'
+                var url = window.location.origin + '/api/comment/tag/'
                 const response = await fetch(url);
                 const data = await response.json();
                 var temp_list = []
@@ -111,7 +113,7 @@
                 console.log(error)
             }
         },
-async fetchData(url = document.location.origin + '/api/comment/' ) {
+async fetchData(url = document.location.origin + '/api/comment/fast/' ) {
   try {
     const response = await fetch(url);
     const data = await response.json();
@@ -122,12 +124,12 @@ async fetchData(url = document.location.origin + '/api/comment/' ) {
       };
     }
 
-    this.reviewStats = []; // API'den alınan verilere göre güncelleyin
     this.pagination = {
       count: data.count,
       next: data.next,
       previous: data.previous
     };
+    this.get_stats()
   } catch (error) {
     console.error('Veri alınamadı:', error);
   }
@@ -136,7 +138,7 @@ async fetchData(url = document.location.origin + '/api/comment/' ) {
 
 
           try {
-            const response = await fetch('http://127.0.0.1:8000/api/comment/' + this.comment.id + '/', {
+            const response = await fetch(window.location.origin + '/api/comment/' + this.comment.id + '/', {
               method: 'PUT',
               headers: {
                 'Content-Type': 'application/json',
@@ -155,8 +157,50 @@ async fetchData(url = document.location.origin + '/api/comment/' ) {
 
             // Yorum kaydedildikten sonra verileri güncelleyin veya yeni veri isteği yapın
             this.fetchData();
+
           } catch (error) {
             console.error('Yorum kaydedilemedi:', error);
+          }
+        },
+      async deleteComment() {
+
+
+          try {
+            const response = await fetch(window.location.origin + '/api/comment/' + this.comment.id + '/', {
+              method: 'DELETE',
+              headers: {
+                'Content-Type': 'application/json',
+                  'X-CSRFToken': this.token
+              },
+            });
+
+            this.user_log.push(`Yorum silindi: id:${this.comment.id} > `)
+
+            // Yorum kaydedildikten sonra verileri güncelleyin veya yeni veri isteği yapın
+            this.fetchData();
+          } catch (error) {
+            console.error('Yorum kaydedilemedi:', error);
+          }
+        },
+      async get_stats() {
+
+
+          try {
+            const response = await fetch(window.location.origin + '/api/comment/stat/', {
+              method: 'GET',
+              headers: {
+                'Content-Type': 'application/json',
+                  'X-CSRFToken': this.token
+              },
+            });
+
+            const data = await response.json();
+            this.reviewStats = data; // API'den alınan verilere göre güncelleyin
+
+
+            // Yorum kaydedildikten sonra verileri güncelleyin veya yeni veri isteği yapın
+          } catch (error) {
+            console.error('stat alınaamdı:', error);
           }
         },
         toggleDeleteStatus() {

@@ -1,6 +1,6 @@
 from django.urls import path, include
 from comment.views import *
-
+from ai.views import PoolFastTagView
 
 app_name = "comment"
 
