@@ -20,10 +20,7 @@ DEBUG = True
 ALLOWED_HOSTS = ['*']
 
 
-CSRF_TRUSTED_ORIGINS = ['https://*.up.railway.app', "https://smart-room-production.up.railway.app/",
-                        'https://smart.farukseker.gen.tr/',
-                        'https://24m9nvnv.up.railway.app',
-                        'https://smart.farukseker.gen.tr']
+CSRF_TRUSTED_ORIGINS = ['https://analiz.darken.gen.tr/', 'https://analiz.darken.gen.tr',]
 
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
