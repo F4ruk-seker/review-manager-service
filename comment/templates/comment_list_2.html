@@ -154,7 +154,7 @@
             for (let i = 0; i <this.comment_list.length; i++) {
                 if (this.comment_list[i].id === comment_id){
                       try {
-                        const response = await fetch('http://127.0.0.1:8000/api/comment/' + this.comment_list[i].id + '/', {
+                        const response = await fetch(window.location.origin + '/api/comment/' + this.comment_list[i].id + '/', {
                           method: 'PUT',
                           headers: {
                             'Content-Type': 'application/json',
@@ -206,7 +206,7 @@
         },
         async fetch_load_comment_list_from_api(){
             try {
-                var url = 'http://127.0.0.1:8000/api/comment/'
+                var url = window.location.origin + '/api/comment/'
                 const response = await fetch(url);
                 const data = await response.json();
                 this.comment_list = data
@@ -217,7 +217,7 @@
         },
         async fetchTagData(){
             try {
-                var url = 'http://127.0.0.1:8000/api/comment/tag/'
+                var url = window.location.origin + '/api/comment/tag/'
                 const response = await fetch(url);
                 const data = await response.json();
                 var temp_list = []

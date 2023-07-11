@@ -87,7 +87,7 @@ user_log: [],
     },
         async fetchTagData(){
             try {
-                var url = 'http://127.0.0.1:8000/api/comment/tag/'
+                var url = window.location.origin + '/api/comment/tag/'
                 const response = await fetch(url);
                 const data = await response.json();
                 var temp_list = []
@@ -129,7 +129,7 @@ user_log: [],
 
 
           try {
-            const response = await fetch('http://127.0.0.1:8000/api/comment/' + this.comment.id + '/', {
+            const response = await fetch(window.location.origin + '/api/comment/' + this.comment.id + '/', {
               method: 'PUT',
               headers: {
                 'Content-Type': 'application/json',
