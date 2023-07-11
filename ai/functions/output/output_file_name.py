@@ -1,7 +1,7 @@
 from datetime import datetime
 
 
-def generate_output_file_name(file_id, extension, header: str = '') -> str:
+def generate_output_file_name(file_id, extension, header = ''):
     now: datetime = datetime.now()
 
     formatted_date: str = now.strftime("%d-%m-%Y")

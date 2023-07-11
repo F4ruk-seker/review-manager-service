@@ -8,7 +8,7 @@ import pandas as pd
 from io import BytesIO
 
 
-def get_rendered_excel_file_response(pool: CommentPool, comment_list: list[CommentModel]) -> HttpResponse:
+def get_rendered_excel_file_response(pool: CommentPool, comment_list):
     output_file_name: str = generate_output_file_name(pool.id, "xlsx")
 
     with BytesIO() as b:
