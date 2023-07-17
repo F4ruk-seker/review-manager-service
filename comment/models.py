@@ -1,5 +1,6 @@
 from django.db import models
 from django.core.exceptions import ValidationError
+from datetime import datetime, timezone, timedelta
 
 
 class CommentModel(models.Model):
@@ -10,7 +11,18 @@ class CommentModel(models.Model):
     branch_from = models.ForeignKey('branch.BranchModel', on_delete=models.SET_NULL, null=True, blank=True)
     create = models.DateTimeField(auto_created=True, default=None, null=True)
 
-    def get_as_json(self) :
+    pass_time_out = models.DateTimeField(default=None, null=True, blank=True)
+
+    def is_time_out_range(self):
+        if self.pass_time_out is not None:
+            end_time = self.pass_time_out.replace(tzinfo=timezone.utc)
+            current_time = datetime.now(timezone.utc)
+            return not current_time > end_time
+
+        else:
+            return False
+
+    def get_as_json(self):
         return {
             'text': self.text,
             'ai_tag': self.ai_tag.name if self.ai_tag else None,

@@ -26,9 +26,10 @@
             </label>
           </div>
           <input type="checkbox" @change="toggleDeleteStatus" class="btn-check" id="comment_delete_status" autocomplete="off">
-          <label class="btn btn-outline-danger btn-lg" id="comment_delete_status_label" type="button" @click="deleteComment()">Sil</label>
+          <label class="btn btn-outline-danger btn-lg me-5" id="comment_delete_status_label" type="button" @click="deleteComment()">Sil</label>
 
-          <button type="submit" class="btn btn-success btn-lg mx-5" role="button" id="save">Kaydet</button>
+          <button type="submit" class="btn btn-success btn-lg me-5" role="button" id="save">Kaydet</button>
+          <button type="button" class="btn btn-warning text-light btn-lg " @click="fetchPassCommentData()" role="button" id="pass">pass</button>
         </div>
         <br>
 
@@ -112,6 +113,30 @@
                 this.tags = []
                 console.log(error)
             }
+        },
+        async fetchPassCommentData(){
+           try {
+            const response = await fetch(window.location.origin + '/api/comment/pass/' + this.comment.id + '/', {
+              method: 'PUT',
+              headers: {
+                'Content-Type': 'application/json',
+                  'X-CSRFToken': this.token
+              },
+                body: JSON.stringify({
+                  id:this.comment.id,
+              })
+            });
+
+            const data = await response.json();
+            console.log('Yorum pas geçildi:', data);
+            {#this.user_log.push(`Yorum pass geçildi : id:${data.id} > tag-id:${data.tag}`)#}
+
+            // Yorum kaydedildikten sonra verileri güncelleyin veya yeni veri isteği yapın
+            this.fetchData();
+            this.goToNextPage();
+          } catch (error) {
+            console.error('Yorum kaydedilemedi:', error);
+          }
         },
 async fetchData(url = document.location.origin + '/api/comment/fast/' ) {
   try {
@@ -207,7 +232,8 @@ async fetchData(url = document.location.origin + '/api/comment/fast/' ) {
           this.comment.delete = !this.comment.delete;
         },
 goToPreviousPage() {
-  const previousPageUrl = this.pagination.previous.replace('http', 'https');
+  {#const previousPageUrl = this.pagination.previous.replace('http', 'https');#}
+  const previousPageUrl = this.pagination.previous;
   if (previousPageUrl) {
     this.fetchData(previousPageUrl);
   } else {
@@ -215,7 +241,8 @@ goToPreviousPage() {
   }
 },
 goToNextPage() {
-  const nextPageUrl = this.pagination.next.replace('http', 'https');
+  {#const nextPageUrl = this.pagination.next.replace('http', 'https');#}
+  const nextPageUrl = this.pagination.next;
   if (nextPageUrl) {
     this.fetchData(nextPageUrl);
   } else {

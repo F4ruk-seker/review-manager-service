@@ -12,6 +12,12 @@ class CommentSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class CommentPassSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = CommentModel
+        fields = ('id', )
+
 
 class CustomizedCommentBranchSerializer(CommentSerializer):
     ai_tag = CommentTagSerializer()
