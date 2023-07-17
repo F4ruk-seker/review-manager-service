@@ -1,0 +1,216 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+.metric {
+    width: 150px!important;
+    height: 150px!important;
+}
+</style>
+<div id="app">
+    <section class="card">
+        <div class="input-group">
+            <input id="search_bar" type="text" placeholder="şube adı, id, url" class="form-control" @input="loadBranchData">
+        </div>
+    </section>
+
+    <br>
+
+    <section class="card">
+        <table class="table table-sm table-light table-striped border pb-0 mb-0">
+            <thead>
+                <tr class="pe-5">
+                    <th scope="col" style="width: 200px">#</th>
+                    <th scope="col" style="text-align: center;padding-right: 20px">name</th>
+                    <th scope="col" style="text-align: left; width: 150px;">last update</th>
+                </tr>
+            </thead>
+        </table>
+        <div style="overflow-y: auto;max-height: 50vh">
+            <table class="table table-sm table-light table-striped border mb-0">
+            {% verbatim %}
+                <tbody id="branch-table">
+                    <tr v-for="branch in branch_list" :key="branch.id">
+                        <th>{{ branch.index }}</th>
+                        <td>{{ branch.name }}</td>
+                        <td><canvas class="metric" :id="'ChartMetric_' + (branch.index - 1)" width="150" height="150"></canvas></td>
+                        <td v-if="branch.metric_list[0]">{{ branch.metric_list[0].calculation_time}}</td>
+                        <td v-else>Tanımsız</td>
+                    </tr>
+                </tbody>
+            {% endverbatim %}
+            </table>
+        </div>
+    </section>
+
+    <br>
+
+    <section class="card">
+        <canvas id="myChart"></canvas>
+    </section>
+</div>
+<script src="//cdnjs.cloudflare.com/ajax/libs/Chart.js/2.1.4/Chart.min.js"></script>
+
+<script>
+    new Vue({
+        el: '#app',
+        data: {
+            branch_list: []
+        },
+        mounted: async function() {
+            await this.loadBranchData();
+            this.createChart(); // Call the createChart method after loading the branch data
+        },
+        methods: {
+            get_branch_only_metric(index){
+                var latest_metric = []
+                var latest_metric_title = []
+                var latest_metric_data = this.branch_list[index].metric_list[0]
+                if (latest_metric_data){
+                    for (var itemsKey in latest_metric_data) {
+                        if (itemsKey.endsWith('count')){
+                            latest_metric_title.push(itemsKey.replace('_count',''))
+                            latest_metric.push(latest_metric_data[itemsKey])
+                        }
+                    }
+                    return [latest_metric, latest_metric_title]
+                }
+
+            },
+            loadBranchData: async function() {
+                var query = document.querySelector('#search_bar').value;
+                var API_PATH = window.origin + "/api" + "/branch/?search=" + query;
+                const response = await fetch(API_PATH);
+                const jsonData = await response.json();
+
+                // Assuming jsonData is a list of branch objects
+                this.branch_list = jsonData.map((branch, index) => {
+                    return {
+                        index: index + 1, // Index starts from 1
+                        name: branch.name,
+                        id: branch.id,
+                        metric_list: branch.metric_list
+                    };
+                });
+            },
+            createChart: async function() {
+                console.log("func call")
+                var canvas_list = await document.querySelectorAll('.metric')
+                console.log(canvas_list)
+                for (let i = 0; i < canvas_list.length; i++) {
+                    let obj_index = canvas_list[i].id.split('_')[1]
+                    var metric_data =  this.get_branch_only_metric(parseInt(obj_index))
+                    if (metric_data){
+                        var ctx = document.getElementById(canvas_list[i].id).getContext('2d');
+                        var data = {
+                            "labels": metric_data[1],
+                            "datasets": [
+                                {
+                                    "label": "Category1",
+                                    "backgroundColor": '#ffffff',
+                                    "fill": false,
+                                    "data": metric_data[0],
+                                    "borderColor": "#ff9300",
+                                    "pointRadius": "10",
+                                    "pointBackgroundColor": "#945200",
+                                    "pointBorderColor": "#ff9300",
+                                    "lineTension": 0.9,
+                                    "pointBorderWidth": 5,
+                                    "pointHoverBackgroundColor": "#ff9300",
+                                    "pointHoverBorderColor": "#945200"
+                                }
+                            ]
+                        };
+                        var options = {
+                            "title": {
+                                "display": false,
+                                "fontColor": "#ce0d0d",
+                                "text": "test"
+                            },
+                            "legend": {
+                                "display": false,
+                                "position": "bottom",
+                                "labels": {
+                                    "boxWidth": 1,
+                                    "fontColor": "#c62a2a"
+                                }
+                            },
+                            "scales": {
+                                "yAxes": [
+                                    {
+                                        "ticks": {
+                                            "beginAtZero": true
+                                        },
+                                        "gridLines": {
+                                            "display": false,
+                                            "lineWidth": 1,
+                                            "drawOnChartArea": false,
+                                            "color": "#772727",
+                                            "zeroLineColor": "#000000",
+                                            "zeroLineWidth": 1,
+                                            "drawTicks": false
+                                        },
+                                        "type": "radiolinear",
+                                        "display": true,
+                                        "position": "left"
+                                    }
+                                ],
+                                "xAxes": {
+                                    "0": {
+                                        "gridLines": {
+                                            "drawOnChartArea": false,
+                                            "offsetGridLines": false,
+                                            "zeroLineColor": "#000000",
+                                            "display": false,
+                                            "lineWidth": 2,
+                                            "drawTicks": false,
+                                            "zeroLineWidth": 2,
+                                            "color": "#000000"
+                                        },
+                                        "ticks": {
+                                            "display": false,
+                                            "beginAtZero": false
+                                        },
+                                        "display": false,
+                                        "type": "category"
+                                    }
+                                }
+                            },
+                            "elements": {
+                                "line": {
+                                    "borderColor": "#ea0404",
+                                    "lineTension": 0,
+                                    "backgroundColor": "#cd0a0a"
+                                }
+                            },
+                            "tooltips": {
+                                "enabled": true,
+                                "backgroundColor": "#575757",
+                                "mode": "single",
+                                "titleFontFamily": "",
+                                "titleColor": "#000000"
+                            },
+                            "animation": {
+                                "duration": ""
+                            }
+                        };
+
+                        var myChart = new Chart(ctx, {
+                            type: 'pie',
+                            data: data,
+                            options: options
+                        });
+                        }
+                    }
+
+
+
+
+            }
+
+        }
+    });
+</script>
+
+
+{% endblock %}

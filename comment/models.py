@@ -30,24 +30,33 @@ class CommentModel(models.Model):
         }
 
 
+# sincere_count = models.IntegerField(default=0)
+# reputable_count = models.IntegerField(default=0)
+# powerful_count = models.IntegerField(default=0)
+# competence_count = models.IntegerField(default=0)
+# excitement_count = models.IntegerField(default=0)
+
+
 class CommentTag(models.Model):
     name = models.TextField()
+    sub_name = models.TextField(default=None, null=True)
     explanation = models.TextField()
-    color = models.TextField(default=None, null=True)
+    color = models.ForeignKey('comment.CommentTagColor',default=None, null=True, blank=True, on_delete=models.CASCADE)
 
     @classmethod
     def load_built_in_tags(cls):
         tags = [
-            {"name": "YETKİNLİK", "explanation": "Açıklama yok"},
-            {"name": "İÇTEN", "explanation": "Açıklama yok"},
-            {"name": "SAYGIN", "explanation": "Açıklama yok"},
-            {"name": "GÜÇLÜ", "explanation": "Açıklama yok"},
-            {"name": "HEYCAN", "explanation": "Açıklama yok"},
-            {"name": "OLUMSUZ", "explanation": "Açıklama yok"},
+            {"name": "YETKİNLİK", 'sub_name': 'competence', "explanation": "Açıklama yok"},
+            {"name": "İÇTEN", 'sub_name': 'sincere', "explanation": "Açıklama yok"},
+            {"name": "SAYGIN", 'sub_name': 'reputable', "explanation": "Açıklama yok"},
+            {"name": "GÜÇLÜ", 'sub_name': 'powerful', "explanation": "Açıklama yok"},
+            {"name": "HEYCAN", 'sub_name': 'excitement', "explanation": "Açıklama yok"},
+            {"name": "OLUMSUZ", 'sub_name': 'negative', "explanation": "Açıklama yok"},
         ]
         for tag in tags:
             cls.objects.create(
                 name=tag.get('name'),
+                sub_name=tag.get('sub_name'),
                 explanation=tag.get('explanation')
             )
 
@@ -55,17 +64,10 @@ class CommentTag(models.Model):
         return f"{ self.name } - { self.explanation }"
 
 
+class CommentTagColor(models.Model):
+    name = models.TextField()
+    hex_code = models.TextField()
 
+    def __str__(self):
+        return f"{self.name.title()} #{self.hex_code}"
 
-
-    '''
-    
-    def save(
-        self, *args, **kwargs
-    ):
-        if not self.is_trained:
-            return super().save(self, *args, **kwargs)
-        else:
-            raise ValidationError('you cannot update if your repository is trained')
-            
-    '''

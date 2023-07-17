@@ -5,8 +5,9 @@ from branch.models import BranchModel, BranchMetric
 class BranchMetricSerializer(serializers.ModelSerializer):
     class Meta:
         model = BranchMetric
-        # fields = '__all__'
-        exclude = ('calculation_time', )
+        fields = '__all__'
+
+    calculation_time = serializers.DateField(read_only=True)
 
 
 class BranchSerializer(serializers.ModelSerializer):
@@ -24,6 +25,8 @@ class BranchSerializer(serializers.ModelSerializer):
                 BranchMetricSerializer(instance=metric).data
             )
         return metric_list
+
+    # calculation_time
 
     class Meta:
         model = BranchModel

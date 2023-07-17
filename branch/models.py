@@ -25,6 +25,7 @@ class BranchMetric(models.Model):
     powerful_count = models.IntegerField(default=0)
     competence_count = models.IntegerField(default=0)
     excitement_count = models.IntegerField(default=0)
+
     repetitive_words = models.JSONField(blank=True, null=True)
     calculation_time = models.DateField(auto_created=True)
 

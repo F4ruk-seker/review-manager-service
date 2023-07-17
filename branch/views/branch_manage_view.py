@@ -6,7 +6,7 @@ from branch.models import BranchModel
 class BranchListView(View):
 
     def get(self, request, *args, **kwargs):
-        return render(request, "branch_list_manage_view.html")
+        return render(request, "branch_list_manage_view_2_test.html")
 
 
 class BranchManager(DetailView):
