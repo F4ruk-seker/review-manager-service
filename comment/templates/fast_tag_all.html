@@ -232,8 +232,8 @@ async fetchData(url = document.location.origin + '/api/comment/fast/' ) {
           this.comment.delete = !this.comment.delete;
         },
 goToPreviousPage() {
-  {#const previousPageUrl = this.pagination.previous.replace('http', 'https');#}
-  const previousPageUrl = this.pagination.previous;
+  const previousPageUrl = this.pagination.previous.replace('http', 'https');
+  {#const previousPageUrl = this.pagination.previous;#}
   if (previousPageUrl) {
     this.fetchData(previousPageUrl);
   } else {
@@ -241,8 +241,8 @@ goToPreviousPage() {
   }
 },
 goToNextPage() {
-  {#const nextPageUrl = this.pagination.next.replace('http', 'https');#}
-  const nextPageUrl = this.pagination.next;
+  const nextPageUrl = this.pagination.next.replace('http', 'https');
+  {#const nextPageUrl = this.pagination.next;#}
   if (nextPageUrl) {
     this.fetchData(nextPageUrl);
   } else {
