@@ -68,6 +68,24 @@ class CommentTagColor(models.Model):
     name = models.TextField()
     hex_code = models.TextField()
 
+    @classmethod
+    def load_built_in_colors(cls):
+        tags = [
+            {"name": "Primary", 'hex_code': '3B71CA'},
+            {"name": "Secondary", 'hex_code': '9FA6B2'},
+            {"name": "Success", 'hex_code': '14A44D'},
+            {"name": "Danger", 'hex_code': 'DC4C64'},
+            {"name": "Warning", 'hex_code': 'E4A11B'},
+            {"name": "Info", 'hex_code': '54B4D3'},
+            {"name": "Light", 'hex_code': 'FBFBFB'},
+            {"name": "Dark", 'hex_code': '332D2D'},
+        ]
+        for tag in tags:
+            cls.objects.create(
+                name=tag.get('name').lower(),
+                hex_code=tag.get('hex_code'),
+            )
+
     def __str__(self):
         return f"{self.name.title()} #{self.hex_code}"
 

@@ -25,9 +25,19 @@ class BranchMetric(models.Model):
     powerful_count = models.IntegerField(default=0)
     competence_count = models.IntegerField(default=0)
     excitement_count = models.IntegerField(default=0)
+    negative_count = models.IntegerField(default=0)
 
     repetitive_words = models.JSONField(blank=True, null=True)
     calculation_time = models.DateField(auto_created=True)
+
+    def get_counts_with_name(self):
+        return {
+            'sincere_count': self.sincere_count,
+            'reputable_count': self.reputable_count,
+            'powerful_count': self.powerful_count,
+            'competence_count': self.competence_count,
+            'excitement_count': self.excitement_count,
+        }
 
     def get_total_metric(self):
         return sum(self.get_counter_counts().values())
@@ -60,6 +70,7 @@ class BranchMetric(models.Model):
             {"name": "powerful", "result": round((self.powerful_count / total) * 100, 2)},  # güç
             {"name": "competence", "result": round((self.competence_count / total) * 100, 2)},  # yetkinlik
             {"name": "excitement", "result": round((self.excitement_count / total) * 100, 2)},  # heyecan
+            {"name": "negative", "result": round((self.negative_count / total) * 100, 2)},  # heyecan
         ]
 
     def get_counter_counts(self) :

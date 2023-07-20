@@ -6,8 +6,88 @@
     width: 150px!important;
     height: 150px!important;
 }
+.competence > input {
+    color: red!important;
+}
 </style>
-<div id="app">
+
+    <script>
+        function draw_knobs() {
+             $(function($) {
+
+                $(".knob").knob({
+
+
+                    draw : function () {
+
+                        // "tron" case
+                        if(this.$.data('skin') == 'tron') {
+
+                            this.cursorExt = 0.3;
+
+                            var a = this.arc(this.cv)  // Arc
+                                , pa                   // Previous arc
+                                , r = 1;
+
+                            this.g.lineWidth = this.lineWidth;
+
+                            if (this.o.displayPrevious) {
+                                pa = this.arc(this.v);
+                                this.g.beginPath();
+                                this.g.strokeStyle = this.pColor;
+                                this.g.arc(this.xy, this.xy, this.radius - this.lineWidth, pa.s, pa.e, pa.d);
+                                this.g.stroke();
+                            }
+
+                            this.g.beginPath();
+                            this.g.strokeStyle = r ? this.o.fgColor : this.fgColor ;
+                            this.g.arc(this.xy, this.xy, this.radius - this.lineWidth, a.s, a.e, a.d);
+                            this.g.stroke();
+
+                            this.g.lineWidth = 2;
+                            this.g.beginPath();
+                            this.g.strokeStyle = this.o.fgColor;
+                            this.g.arc( this.xy, this.xy, this.radius - this.lineWidth + 1 + this.lineWidth * 2 / 3, 0, 2 * Math.PI, false);
+                            this.g.stroke();
+
+                            return false;
+                        }
+                    }
+                });
+
+                // Example of infinite knob, iPod click wheel
+                var v, up=0,down=0,i=0
+                    ,$idir = $("div.idir")
+                    ,$ival = $("div.ival")
+                    ,incr = function() { i++; $idir.show().html("+").fadeOut(); $ival.html(i); }
+                    ,decr = function() { i--; $idir.show().html("-").fadeOut(); $ival.html(i); };
+                $("input.infinite").knob(
+                                    {
+                                    min : 0
+                                    , max : 20
+                                    , stopper : false
+                                    , change : function () {
+                                                    if(v > this.cv){
+                                                        if(up){
+                                                            decr();
+                                                            up=0;
+                                                        }else{up=1;down=0;}
+                                                    } else {
+                                                        if(v < this.cv){
+                                                            if(down){
+                                                                incr();
+                                                                down=0;
+                                                            }else{down=1;up=0;}
+                                                        }
+                                                    }
+                                                    v = this.cv;
+                                                }
+                                    });
+            });
+        }
+    </script>
+
+    <div id="app">
     <section class="card">
         <div class="input-group">
             <input id="search_bar" type="text" placeholder="şube adı, id, url" class="form-control" @input="loadBranchData">
@@ -15,38 +95,65 @@
     </section>
 
     <br>
+{% verbatim %}
 
     <section class="card">
         <table class="table table-sm table-light table-striped border pb-0 mb-0">
             <thead>
-                <tr class="pe-5">
-                    <th scope="col" style="width: 200px">#</th>
-                    <th scope="col" style="text-align: center;padding-right: 20px">name</th>
-                    <th scope="col" style="text-align: left; width: 150px;">last update</th>
+                <tr class="">
+                    <th scope="col" >#</th>
+
+                    <th scope="col" style="text-align: center;">Name</th>
+
+                    <th scope="col" :style="'text-align: center;color:' + getTagColor('competence')" key="competence">Yetkin</th>
+                    <th scope="col" :style="'text-align: center;color:' + getTagColor('sincere')" key="sincere">İçten</th>
+                    <th scope="col" :style="'text-align: center;color:' + getTagColor('powerful')" key="powerful">Güçlü</th>
+                    <th scope="col" :style="'text-align: center;color:' + getTagColor('reputable')" key="reputable">Saygın</th>
+                    <th scope="col" :style="'text-align: center;color:' + getTagColor('excitement')" key="excitement">Heycan</th>
+                    <th scope="col" :style="'text-align: center;color:' + getTagColor('negative')" key="negative">Olumsuz</th>
+
+                    <th scope="col" style="text-align: left;">last update</th>
                 </tr>
             </thead>
-        </table>
-        <div style="overflow-y: auto;max-height: 50vh">
-            <table class="table table-sm table-light table-striped border mb-0">
-            {% verbatim %}
+        <!--div style="overflow-y: auto;max-height: 50vh"-->
+            <!--table class="table table-sm table-light table-striped border mb-0"-->
                 <tbody id="branch-table">
                     <tr v-for="branch in branch_list" :key="branch.id">
-                        <th>{{ branch.index }}</th>
-                        <td>{{ branch.name }}</td>
-                        <td><canvas class="metric" :id="'ChartMetric_' + (branch.index - 1)" width="150" height="150"></canvas></td>
-                        <td v-if="branch.metric_list[0]">{{ branch.metric_list[0].calculation_time}}</td>
-                        <td v-else>Tanımsız</td>
+                        <th >{{ branch.index }}</th>
+                        <td >{{ branch.name }}</td>
+
+                        <td class="position-relative" style="text-align: center" v-if="branch.chart_context.competence"><input class="knob" data-width="100" data-height="100" data-min="0" data-displayprevious="true" :value="branch.chart_context.competence" data-angleOffset=-90 :data-fgColor="getTagColor('competence')" readonly></td>
+                        <td class="position-relative" style="text-align: center" v-else><input class="knob" data-width="100" data-height="100" data-min="0" data-displayprevious="true" value="0" data-angleOffset=-90 :data-fgColor="getTagColor('competence')" readonly></td>
+
+                        <td class="position-relative" style="text-align: center" v-if="branch.chart_context.sincere"><input class="knob" data-width="100" data-height="100" data-min="0" data-displayprevious="true" :value="branch.chart_context.sincere" data-angleOffset=-90 :data-fgColor="getTagColor('sincere')" readonly></td>
+                        <td class="position-relative" style="text-align: center" v-else><input class="knob" data-width="100" data-height="100" data-min="0" data-displayprevious="true" value="0" data-angleOffset=-90 :data-fgColor="getTagColor('sincere')" readonly></td>
+
+                        <td class="position-relative" style="text-align: center" v-if="branch.chart_context.powerful"><input class="knob" data-width="100" data-height="100" data-min="0" data-displayprevious="true" :value="branch.chart_context.powerful" data-angleOffset=-90 :data-fgColor="getTagColor('powerful')" readonly></td>
+                        <td class="position-relative" style="text-align: center" v-else><input class="knob" data-width="100" data-height="100" data-min="0" data-displayprevious="true" value="0" data-angleOffset=-90 :data-fgColor="getTagColor('powerful')" readonly></td>
+
+                        <td class="position-relative" style="text-align: center" v-if="branch.chart_context.reputable"><input class="knob" data-width="100" data-height="100" data-min="0" data-displayprevious="true" :value="branch.chart_context.reputable" data-angleOffset=-90 :data-fgColor="getTagColor('reputable')" readonly></td>
+                        <td class="position-relative" style="text-align: center" v-else><input class="knob" data-width="100" data-height="100" data-min="0" data-displayprevious="true" value="0" data-angleOffset=-90 :data-fgColor="getTagColor('reputable')" readonly></td>
+
+                        <td class="position-relative" style="text-align: center" v-if="branch.chart_context.excitement"><input class="knob" data-width="100" data-height="100" data-min="0" data-displayprevious="true" :value="branch.chart_context.excitement" data-angleOffset=-90 :data-fgColor="getTagColor('excitement')" readonly></td>
+                        <td class="position-relative" style="text-align: center" v-else><input class="knob" data-width="100" data-height="100" data-min="0" data-displayprevious="true" value="0" data-angleOffset=-90 :data-fgColor="getTagColor('excitement')" readonly></td>
+
+                        <td class="position-relative" style="text-align: center" v-if="branch.chart_context.negative"><input class="knob" data-width="100" data-height="100" data-min="0" data-displayprevious="true" :value="branch.chart_context.negative" data-angleOffset=-90 :data-fgColor="getTagColor('negative')" readonly></td>
+                        <td class="position-relative" style="text-align: center" v-else><input class="knob" data-width="100" data-height="100" data-min="0" data-displayprevious="true" value="0" data-angleOffset=-90 :data-fgColor="getTagColor('negative')" readonly></td>
+
+                        <td class="my-auto text-left">{{ branch.metric_list.calculation_time ? branch.metric_list.calculation_time : 'Tanımsız'}}</td>
                     </tr>
                 </tbody>
-            {% endverbatim %}
-            </table>
-        </div>
+            <!--/table-->
+        <!--/div-->
+        </table>
+
     </section>
+{% endverbatim %}
 
     <br>
 
-    <section class="card">
-        <canvas id="myChart"></canvas>
+    <section class="card p-2 mb-3">
+        <strong>Data Service PARS - NSEREN</strong>
     </section>
 </div>
 <script src="//cdnjs.cloudflare.com/ajax/libs/Chart.js/2.1.4/Chart.min.js"></script>
@@ -55,29 +162,29 @@
     new Vue({
         el: '#app',
         data: {
-            branch_list: []
+            branch_list: [],
+            tag: []
         },
         mounted: async function() {
+            await this.loadTagData();
             await this.loadBranchData();
-            this.createChart(); // Call the createChart method after loading the branch data
         },
         methods: {
-            get_branch_only_metric(index){
+            get_branch_only_metric(index) {
                 var latest_metric = []
                 var latest_metric_title = []
                 var latest_metric_data = this.branch_list[index].metric_list[0]
-                if (latest_metric_data){
+                if (latest_metric_data) {
                     for (var itemsKey in latest_metric_data) {
-                        if (itemsKey.endsWith('count')){
-                            latest_metric_title.push(itemsKey.replace('_count',''))
+                        if (itemsKey.endsWith('count')) {
+                            latest_metric_title.push(itemsKey.replace('_count', ''))
                             latest_metric.push(latest_metric_data[itemsKey])
                         }
                     }
                     return [latest_metric, latest_metric_title]
                 }
-
             },
-            loadBranchData: async function() {
+            loadBranchData: async function () {
                 var query = document.querySelector('#search_bar').value;
                 var API_PATH = window.origin + "/api" + "/branch/?search=" + query;
                 const response = await fetch(API_PATH);
@@ -89,126 +196,29 @@
                         index: index + 1, // Index starts from 1
                         name: branch.name,
                         id: branch.id,
-                        metric_list: branch.metric_list
+                        metric_list: (branch.metric_list && branch.metric_list.length) ? branch.metric_list[0] : [],
+                        chart_context: (branch.metric_list && branch.metric_list.length) ? branch.metric_list[0].chart_context : [],
                     };
                 });
+                this.createChart();
             },
-            createChart: async function() {
-                console.log("func call")
-                var canvas_list = await document.querySelectorAll('.metric')
-                console.log(canvas_list)
-                for (let i = 0; i < canvas_list.length; i++) {
-                    let obj_index = canvas_list[i].id.split('_')[1]
-                    var metric_data =  this.get_branch_only_metric(parseInt(obj_index))
-                    if (metric_data){
-                        var ctx = document.getElementById(canvas_list[i].id).getContext('2d');
-                        var data = {
-                            "labels": metric_data[1],
-                            "datasets": [
-                                {
-                                    "label": "Category1",
-                                    "backgroundColor": '#ffffff',
-                                    "fill": false,
-                                    "data": metric_data[0],
-                                    "borderColor": "#ff9300",
-                                    "pointRadius": "10",
-                                    "pointBackgroundColor": "#945200",
-                                    "pointBorderColor": "#ff9300",
-                                    "lineTension": 0.9,
-                                    "pointBorderWidth": 5,
-                                    "pointHoverBackgroundColor": "#ff9300",
-                                    "pointHoverBorderColor": "#945200"
-                                }
-                            ]
-                        };
-                        var options = {
-                            "title": {
-                                "display": false,
-                                "fontColor": "#ce0d0d",
-                                "text": "test"
-                            },
-                            "legend": {
-                                "display": false,
-                                "position": "bottom",
-                                "labels": {
-                                    "boxWidth": 1,
-                                    "fontColor": "#c62a2a"
-                                }
-                            },
-                            "scales": {
-                                "yAxes": [
-                                    {
-                                        "ticks": {
-                                            "beginAtZero": true
-                                        },
-                                        "gridLines": {
-                                            "display": false,
-                                            "lineWidth": 1,
-                                            "drawOnChartArea": false,
-                                            "color": "#772727",
-                                            "zeroLineColor": "#000000",
-                                            "zeroLineWidth": 1,
-                                            "drawTicks": false
-                                        },
-                                        "type": "radiolinear",
-                                        "display": true,
-                                        "position": "left"
-                                    }
-                                ],
-                                "xAxes": {
-                                    "0": {
-                                        "gridLines": {
-                                            "drawOnChartArea": false,
-                                            "offsetGridLines": false,
-                                            "zeroLineColor": "#000000",
-                                            "display": false,
-                                            "lineWidth": 2,
-                                            "drawTicks": false,
-                                            "zeroLineWidth": 2,
-                                            "color": "#000000"
-                                        },
-                                        "ticks": {
-                                            "display": false,
-                                            "beginAtZero": false
-                                        },
-                                        "display": false,
-                                        "type": "category"
-                                    }
-                                }
-                            },
-                            "elements": {
-                                "line": {
-                                    "borderColor": "#ea0404",
-                                    "lineTension": 0,
-                                    "backgroundColor": "#cd0a0a"
-                                }
-                            },
-                            "tooltips": {
-                                "enabled": true,
-                                "backgroundColor": "#575757",
-                                "mode": "single",
-                                "titleFontFamily": "",
-                                "titleColor": "#000000"
-                            },
-                            "animation": {
-                                "duration": ""
-                            }
-                        };
-
-                        var myChart = new Chart(ctx, {
-                            type: 'pie',
-                            data: data,
-                            options: options
-                        });
-                        }
+            loadTagData: async function () {
+                var API_PATH = window.origin + "/api" + "/comment/tag/";
+                const response = await fetch(API_PATH);
+                this.tag = await response.json();
+            },
+            createChart: async function () {
+                draw_knobs();
+            },
+            getTagColor: function (tag_sub) {
+                for (let tagKey in this.tag) {
+                    if (this.tag[tagKey].sub_name == tag_sub){
+                        return '#' + this.tag[tagKey].color.hex_code.toString()
                     }
-
-
-
-
+                }
             }
+        },
 
-        }
     });
 </script>
 
