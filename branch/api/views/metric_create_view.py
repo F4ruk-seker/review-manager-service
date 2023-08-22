@@ -10,4 +10,4 @@ class BranchMetricCreateView(CreateAPIView):
     queryset = BranchMetric.objects.all()
     serializer_class = BranchMetricSerializer
 
-
+    # def post(self, request, *args, **kwargs):

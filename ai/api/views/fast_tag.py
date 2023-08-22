@@ -26,12 +26,12 @@ class FastTag(ListCreateAPIView):
     pagination_class = FastTagPagination
     serializer_class = CommentTagSerializer
 
-    def get_queryset(self):
-        temp = []
+    def get_queryset(self) -> ListAsQuerySet:
+        _: list = []  # temp
         for comment in CommentModel.objects.filter(tag=None).order_by('id'):
             if not comment.is_time_out_range():
-                temp.append(comment)
+                _.append(comment)
 
-        return ListAsQuerySet(temp, model=CommentModel)
+        return ListAsQuerySet(_, model=CommentModel)
 
 

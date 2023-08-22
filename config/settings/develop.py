@@ -21,3 +21,7 @@ SECRET_KEY = 'django-insecure-u5(9%u^(d7vuupa(x1b#cb5yh4*awwm7)k(8&mmp4eta2$_$5e
 DEBUG = True
 
 ALLOWED_HOSTS = []
+
+MEDIA_ROOT = 'D:\.trained_data\\'
+
+MEDIA_URL = '/media/'

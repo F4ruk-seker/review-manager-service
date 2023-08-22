@@ -35,6 +35,8 @@ INSTALLED_APPS = [
     'ai',
     'Auth',
     'Base',
+    'scraper',
+    'operation',
 ]+[
     'rest_framework',
 ]

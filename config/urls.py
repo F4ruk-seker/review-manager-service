@@ -19,6 +19,8 @@ from django.urls import path, include
 from Auth.views import LoginView
 from Base.views import IndexPage
 
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -28,4 +30,4 @@ urlpatterns = [
     path('branch/', include('branch.urls')),
     path('comment/', include('comment.urls')),
     path('ai/', include('ai.urls')),
-]
+]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

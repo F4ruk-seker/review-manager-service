@@ -21,7 +21,7 @@ class BranchMetricSerializer(serializers.ModelSerializer):
         model = BranchMetric
         fields = '__all__'
 
-    calculation_time = serializers.DateField(read_only=True)
+    calculation_time = serializers.DateField(read_only=True, required=False)
     chart_context = serializers.SerializerMethodField(method_name='get_metric_chart')
 
 
