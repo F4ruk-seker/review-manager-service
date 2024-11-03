@@ -55,7 +55,7 @@
                                 <i class="fa-solid fa-circle-minus"></i>
                             </button>
                         </td>
-                        <td  @click="change_checkbox_status(comment.id)" :key="comment.id">{{ comment.text.length }} > {{ comment.text }}</td>
+                        <td @click="change_checkbox_status(comment.id)" :key="comment.id">{{ comment.text.length }} > {{ comment.text }}</td>
 
                     <td style="width: 200px;">
                         <select v-show="!on_load" class="form-control form-control-sm input-sm" :id="'comment_tag_' + comment.id" @change="change_comment_tag(comment.id)">
