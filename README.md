@@ -17,8 +17,9 @@
 
 ## Data Tables
 
-| ![main page](.preview/Comments.jpg) | ![main page](.preview/test-pool.jpg) | 
-|--------------------------|--------------------------
+![main page](.preview/Comments.jpg) 
+
+![main page](.preview/test-pool.jpg)
 
 ## Data Extraction | csv, excel, xml, json, ...
 
